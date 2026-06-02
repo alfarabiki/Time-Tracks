@@ -1,0 +1,57 @@
+name: timeproof
+description: "TimeProof - Dokumentasi kehadiran & aktivitas kerja dengan bukti foto bertimestamp, lokasi, koordinat, dan kode verifikasi."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Camera
+  camera: ^0.11.0+2
+
+  # Location & geocoding (native Android geocoder = gratis, tanpa API berbayar)
+  geolocator: ^13.0.1
+  geocoding: ^3.0.0
+
+  # Manual location picker (Google Maps SDK for Android - free tier)
+  google_maps_flutter: ^2.9.0
+
+  # Files & paths
+  path_provider: ^2.1.4
+  path: ^1.9.0
+
+  # Simpan ke galeri (/DCIM/TimeProof) - mendukung scoped storage Android 10+
+  gal: ^2.3.0
+
+  # Permissions
+  permission_handler: ^11.3.1
+
+  # Verification code
+  uuid: ^4.5.1
+
+  # Settings storage
+  shared_preferences: ^2.3.2
+
+  # Local database (PhotoHistory)
+  sqflite: ^2.3.3+1
+
+  # Encode JPEG final (kontrol kualitas 80/90/95% & ukuran file)
+  image: ^4.2.0
+
+  # SHA256 hash integritas foto (anti-ubah)
+  crypto: ^3.0.5
+
+  # Format tanggal Indonesia (id_ID)
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_lints: ^4.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

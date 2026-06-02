@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TimeProof — Bukti Foto Terverifikasi</title>
+<meta name="description" content="Aplikasi Android dokumentasi kehadiran & aktivitas kerja dengan bukti foto: timestamp, alamat, koordinat GPS, dan kode verifikasi. Berjalan offline." />
+<meta property="og:title" content="TimeProof — Bukti Foto Terverifikasi" />
+<meta property="og:description" content="Foto kerja dengan timestamp, alamat, koordinat GPS & kode verifikasi. Offline, Android 8–15." />
+<meta property="og:image" content="/assets/sample.jpeg" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230E1726'/><path d='M50 24l20 8v18c0 13-8 22-20 28-12-6-20-15-20-28V32z' fill='%23F5A623'/></svg>" />
+<style>
+  :root{
+    --bg:#0E1726; --bg2:#0a111d; --surface:#18233A; --surface2:#1f2c47;
+    --accent:#F5A623; --accent-d:#d98e12; --text:#EAF0FA; --muted:#93a1bd; --line:#243450;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Roboto',-apple-system,Segoe UI,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+  a{color:inherit;text-decoration:none}
+  .accent{color:var(--accent)}
+
+  /* nav */
+  nav{position:sticky;top:0;z-index:50;backdrop-filter:blur(12px);background:rgba(14,23,38,.78);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:.3px}
+  .logo{width:34px;height:34px;border-radius:9px;background:var(--surface);display:grid;place-items:center}
+  .logo svg{width:20px;height:20px}
+  .nav-links{display:flex;gap:28px;font-size:14px;color:var(--muted)}
+  .nav-links a:hover{color:var(--text)}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#10182a;font-weight:700;padding:11px 18px;border-radius:11px;transition:.18s;border:none;cursor:pointer;font-size:14px}
+  .btn:hover{background:var(--accent-d);transform:translateY(-1px)}
+  .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--accent);background:transparent}
+  @media(max-width:720px){.nav-links{display:none}}
+
+  /* hero */
+  header{padding:84px 0 64px;position:relative;overflow:hidden}
+  header::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 420px at 78% -8%,rgba(245,166,35,.16),transparent 60%);pointer-events:none}
+  .hero{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center;position:relative}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;color:var(--accent);background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.28);padding:6px 13px;border-radius:999px;font-weight:600;letter-spacing:.4px}
+  h1{font-size:52px;line-height:1.08;font-weight:800;margin:20px 0 18px;letter-spacing:-1px}
+  .lead{font-size:18px;color:var(--muted);max-width:520px}
+  .cta{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
+  .specs{display:flex;gap:26px;margin-top:34px;flex-wrap:wrap}
+  .spec b{display:block;font-size:22px;font-weight:800}
+  .spec span{font-size:12.5px;color:var(--muted)}
+  .phone{justify-self:center;width:280px;border-radius:30px;padding:10px;background:linear-gradient(160deg,#202d49,#11192a);box-shadow:0 30px 70px rgba(0,0,0,.55);border:1px solid var(--line)}
+  .phone img{width:100%;border-radius:22px;display:block}
+  @media(max-width:860px){.hero{grid-template-columns:1fr;gap:40px}h1{font-size:38px}.phone{width:240px;order:-1}}
+
+  /* sections */
+  section{padding:74px 0}
+  .eyebrow{color:var(--accent);font-weight:700;font-size:12.5px;letter-spacing:1.6px;text-transform:uppercase}
+  h2{font-size:32px;font-weight:800;margin:10px 0 8px;letter-spacing:-.5px}
+  .sub{color:var(--muted);max-width:620px;margin-bottom:38px}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  @media(max-width:860px){.grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;transition:.18s}
+  .card:hover{border-color:rgba(245,166,35,.45);transform:translateY(-3px)}
+  .ico{width:42px;height:42px;border-radius:11px;background:rgba(245,166,35,.12);display:grid;place-items:center;margin-bottom:14px}
+  .ico svg{width:22px;height:22px;stroke:var(--accent)}
+  .card h3{font-size:16.5px;margin-bottom:6px}
+  .card p{font-size:14px;color:var(--muted)}
+
+  /* quality band */
+  .band{background:linear-gradient(180deg,var(--bg2),var(--bg));border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:860px){.qgrid{grid-template-columns:1fr 1fr}}
+  .q{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .q b{font-size:26px;font-weight:800;color:var(--accent)}
+  .q span{display:block;font-size:13px;color:var(--muted);margin-top:4px}
+
+  .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+  .chip{font-size:13px;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:8px 14px;border-radius:999px}
+  .chip b{color:var(--text);font-weight:600}
+
+  /* download */
+  .dl{background:linear-gradient(135deg,#1d2942,#141d31);border:1px solid var(--line);border-radius:24px;padding:48px;text-align:center;position:relative;overflow:hidden}
+  .dl::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 300px at 50% -20%,rgba(245,166,35,.18),transparent);pointer-events:none}
+  .dl h2{font-size:30px}
+  .dl p{color:var(--muted);max-width:520px;margin:10px auto 28px}
+  .note{font-size:12.5px;color:var(--muted);margin-top:16px}
+
+  footer{padding:40px 0;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">
+      <span class="logo"><svg viewBox="0 0 100 100"><path d="M50 24l20 8v18c0 13-8 22-20 28-12-6-20-15-20-28V32z" fill="#F5A623"/><circle cx="50" cy="46" r="11" fill="#0E1726"/><path d="M50 46V40M50 46l5 3" stroke="#F5A623" stroke-width="2.6" stroke-linecap="round"/></svg></span>
+      TimeProof
+    </div>
+    <div class="nav-links">
+      <a href="#fitur">Fitur</a>
+      <a href="#kualitas">Kualitas</a>
+      <a href="#unduh">Unduh</a>
+      <a href="https://github.com/alfarabiki/Time-Track" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <a href="#unduh" class="btn">Unduh APK</a>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap hero">
+    <div>
+      <span class="pill">● Android 8 – 15 · Offline-first</span>
+      <h1>Bukti foto kerja yang <span class="accent">terverifikasi</span>.</h1>
+      <p class="lead">Dokumentasikan kehadiran, kunjungan lapangan, survey, dan inspeksi dengan foto ber-overlay: waktu, alamat, koordinat GPS, dan kode verifikasi unik — persis gaya Timemark.</p>
+      <div class="cta">
+        <a href="#unduh" class="btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10182a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+          Unduh APK
+        </a>
+        <a href="#fitur" class="btn ghost">Lihat fitur</a>
+      </div>
+      <div class="specs">
+        <div class="spec"><b>14</b><span>karakter kode</span></div>
+        <div class="spec"><b>SHA256</b><span>anti-ubah</span></div>
+        <div class="spec"><b>&lt;3s</b><span>foto tersimpan</span></div>
+        <div class="spec"><b>100%</b><span>offline</span></div>
+      </div>
+    </div>
+    <div class="phone">
+      <img src="/assets/sample.jpeg" alt="Contoh hasil foto TimeProof dengan overlay waktu, alamat, koordinat, dan kode verifikasi" loading="eager" />
+    </div>
+  </div>
+</header>
+
+<section id="fitur">
+  <div class="wrap">
+    <p class="eyebrow">Fitur Utama</p>
+    <h2>Semua yang ada di foto Timemark</h2>
+    <p class="sub">Setiap elemen overlay dirender sebagai teks asli (Roboto) lalu disatukan ke foto — tajam di resolusi penuh, rapi di layar HP kecil sampai tablet.</p>
+    <div class="grid">
+      <div class="card"><div class="ico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></div><h3>Ambil Foto</h3><p>Kamera 1080p, ≤3 klik dari buka aplikasi hingga foto tersimpan ke galeri.</p></div>
+      <div class="card"><div class="ico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Timestamp Indonesia</h3><p>"Selasa, 02 Juni 2026 22:21" — format lokal id_ID lengkap.</p></div>
+      <div class="card"><div class="ico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div><h3>Koordinat GPS</h3><p>6.185037°S, 106.863431°E dengan akurasi (meter) ditampilkan.</p></div>
+      <div class="card"><div class="ico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div><h3>Alamat Otomatis</h3><p>Reverse-geocoding gaya Indonesia, otomatis wrap tanpa terpotong.</p></div>
+      <div class="card"><div class="ico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M12 3l7 3v6c0 5-3.5 8-7 9-3.5-1-7-4-7-9V6z"/></svg></div><h3>Kode Verifikasi</h3><p>Kode acak 14 karakter unik + label "Timemark Verified".</p></div>
+      <div class="card"><div class="ico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7h16v12H4z"/><path d="M8 7V5h8v2"/></svg></div><h3>Template & Custom Text</h3><p>Template A/B/C, teks kustom (Sales Visit, Audit, dll.), toggle elemen.</p></div>
+      <div class="card"><div class="ico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11a7 7 0 0114 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div><h3>Peta Manual</h3><p>Pilih titik lokasi sendiri lewat Google Maps + fallback koordinat manual.</p></div>
+      <div class="card"><div class="ico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div><h3>Riwayat Foto</h3><p>Galeri internal SQLite, cepat untuk ribuan foto, dengan detail & hash.</p></div>
+      <div class="card"><div class="ico"><svg fill="none" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3M21 5v4h-4"/></svg></div><h3>Recovery Draft</h3><p>HP mati saat memotret? "Lanjutkan foto sebelumnya?" saat dibuka lagi.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="kualitas" class="band">
+  <div class="wrap">
+    <p class="eyebrow">Kualitas & Keandalan</p>
+    <h2>Dibangun agar tidak mudah crash</h2>
+    <p class="sub">Setiap izin dicek, setiap exception ditangani, pesan ramah tanpa stack trace. Tetap berfungsi saat GPS mati, internet putus, atau penyimpanan menipis.</p>
+    <div class="qgrid">
+      <div class="q"><b>&lt;0.5%</b><span>target crash rate</span></div>
+      <div class="q"><b>15s</b><span>GPS timeout, tak freeze</span></div>
+      <div class="q"><b>90%</b><span>kualitas JPEG (95/90/80)</span></div>
+      <div class="q"><b>30 hari</b><span>log internal</span></div>
+    </div>
+    <div class="chips">
+      <span class="chip"><b>Offline-first</b> — kamera, GPS, overlay, history jalan tanpa internet</span>
+      <span class="chip"><b>SHA256</b> integritas tiap foto</span>
+      <span class="chip"><b>Dynamic layout</b> 5"–7" & tablet</span>
+      <span class="chip"><b>Hemat baterai</b> — GPS sekali pakai</span>
+      <span class="chip"><b>Storage guard</b> &lt;500 MB</span>
+      <span class="chip">Samsung · Xiaomi · OPPO · Vivo · Realme · Pixel</span>
+    </div>
+  </div>
+</section>
+
+<section id="unduh">
+  <div class="wrap">
+    <div class="dl">
+      <h2>Unduh TimeProof</h2>
+      <p>Pasang APK di perangkat Android 8 ke atas. Izinkan "Instal dari sumber tidak dikenal" jika diminta.</p>
+      <a href="https://github.com/alfarabiki/Time-Track/releases/latest" class="btn" id="apk-link" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10182a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+        Unduh APK Terbaru
+      </a>
+      <p class="note">Kode sumber lengkap tersedia di <a class="accent" href="https://github.com/alfarabiki/Time-Track" target="_blank" rel="noopener">github.com/alfarabiki/Time-Track</a></p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>© 2026 TimeProof · Dibuat dengan Flutter</div>
+    <div>Android 8–15 · Offline-first · Bukti foto terverifikasi</div>
+  </div>
+</footer>
+
+</body>
+</html>
