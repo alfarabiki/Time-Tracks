@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 import '../../services/geocoding_service.dart';
 import '../../services/location_service.dart';
+import '../../services/log_service.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/format_utils.dart';
 
@@ -15,8 +19,12 @@ class MapPickResult {
   const MapPickResult(this.lat, this.lng, this.address);
 }
 
+/// Satu hasil pencarian Nominatim.
+typedef _SearchHit = ({String name, double lat, double lng});
+
 /// Manual Location Picker (Feature 8) memakai OpenStreetMap via flutter_map.
-/// TANPA API key — geser peta, pin tetap di tengah, lalu konfirmasi.
+/// TANPA API key. Bisa: ketik untuk cari lokasi, ketuk peta untuk taruh pin,
+/// geser peta, atau masukkan koordinat manual.
 class MapPickerScreen extends StatefulWidget {
   final MapPickResult? initial;
   const MapPickerScreen({super.key, this.initial});
@@ -29,14 +37,24 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
   static const LatLng _fallback = LatLng(-6.185037, 106.863431); // Jakarta
 
   final MapController _map = MapController();
+  final TextEditingController _searchCtrl = TextEditingController();
+
   LatLng _center = _fallback;
   bool _resolving = false;
   bool _loading = true;
+  bool _searching = false;
+  List<_SearchHit> _results = const [];
 
   @override
   void initState() {
     super.initState();
     _initCenter();
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
   }
 
   Future<void> _initCenter() async {
@@ -50,6 +68,64 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
       _center = LatLng(res.position!.latitude, res.position!.longitude);
     }
     if (mounted) setState(() => _loading = false);
+  }
+
+  /// Cari lokasi by nama via Nominatim (OSM) — gratis, tanpa API key.
+  Future<void> _runSearch() async {
+    final q = _searchCtrl.text.trim();
+    if (q.isEmpty) return;
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _searching = true;
+      _results = const [];
+    });
+    try {
+      final uri = Uri.https('nominatim.openstreetmap.org', '/search', {
+        'q': q,
+        'format': 'jsonv2',
+        'limit': '6',
+        'accept-language': 'id',
+      });
+      final resp = await http.get(uri, headers: {
+        'User-Agent': 'TimeProof/1.1 (com.timeproof.app)',
+      }).timeout(const Duration(seconds: 12));
+
+      if (resp.statusCode == 200) {
+        final data = jsonDecode(resp.body) as List<dynamic>;
+        final hits = <_SearchHit>[];
+        for (final e in data) {
+          final m = e as Map<String, dynamic>;
+          final lat = double.tryParse('${m['lat']}');
+          final lon = double.tryParse('${m['lon']}');
+          final name = (m['display_name'] ?? '').toString();
+          if (lat != null && lon != null && name.isNotEmpty) {
+            hits.add((name: name, lat: lat, lng: lon));
+          }
+        }
+        if (!mounted) return;
+        setState(() => _results = hits);
+        if (hits.isEmpty) {
+          showAppMessage(context, 'Lokasi "$q" tidak ditemukan.');
+        }
+      } else {
+        if (mounted) showAppMessage(context, 'Pencarian gagal. Coba lagi.');
+      }
+    } catch (e) {
+      await LogService.instance.log('Search Failed', detail: e.toString());
+      if (mounted) {
+        showAppMessage(context,
+            'Pencarian gagal (cek internet). Bisa ketuk peta atau koordinat manual.',
+            error: true);
+      }
+    } finally {
+      if (mounted) setState(() => _searching = false);
+    }
+  }
+
+  void _goTo(LatLng target, {double zoom = 17}) {
+    _center = target;
+    _map.move(target, zoom);
+    setState(() => _results = const []);
   }
 
   Future<void> _confirm() async {
@@ -104,8 +180,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
       final lat = double.tryParse(latC.text.trim());
       final lng = double.tryParse(lngC.text.trim());
       if (lat != null && lng != null && lat.abs() <= 90 && lng.abs() <= 180) {
-        setState(() => _center = LatLng(lat, lng));
-        _map.move(_center, _map.camera.zoom);
+        _goTo(LatLng(lat, lng), zoom: _map.camera.zoom);
       } else if (mounted) {
         showAppMessage(context, 'Koordinat tidak valid.', error: true);
       }
@@ -142,6 +217,9 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                       _center = camera.center;
                       if (hasGesture) setState(() {});
                     },
+                    // Ketuk peta untuk menaruh pin (pointing).
+                    onTap: (tapPos, latlng) => _goTo(latlng,
+                        zoom: _map.camera.zoom),
                   ),
                   children: [
                     TileLayer(
@@ -158,19 +236,28 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                   child: Icon(Icons.location_on,
                       color: AppTheme.accent, size: 48),
                 ),
+
+                // ===== Search bar + hasil =====
+                Positioned(
+                  top: 10,
+                  left: 12,
+                  right: 12,
+                  child: _searchArea(),
+                ),
+
                 // Tombol "lokasi saya"
                 Positioned(
                   right: 14,
-                  bottom: 130,
+                  bottom: 140,
                   child: FloatingActionButton.small(
                     backgroundColor: AppTheme.surface,
                     onPressed: () async {
                       final res = await LocationService.instance.getCurrent();
                       if (res.ok && mounted) {
-                        _center = LatLng(
-                            res.position!.latitude, res.position!.longitude);
-                        _map.move(_center, 16);
-                        setState(() {});
+                        _goTo(
+                            LatLng(res.position!.latitude,
+                                res.position!.longitude),
+                            zoom: 16);
                       }
                     },
                     child: const Icon(Icons.my_location, color: Colors.white),
@@ -187,6 +274,81 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
     );
   }
 
+  Widget _searchArea() {
+    return Column(
+      children: [
+        Material(
+          elevation: 4,
+          borderRadius: BorderRadius.circular(12),
+          color: AppTheme.surface,
+          child: TextField(
+            controller: _searchCtrl,
+            textInputAction: TextInputAction.search,
+            onSubmitted: (_) => _runSearch(),
+            style: const TextStyle(color: Colors.white),
+            decoration: InputDecoration(
+              hintText: 'Cari alamat atau tempat...',
+              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+              prefixIcon: const Icon(Icons.search, color: Colors.white70),
+              suffixIcon: _searching
+                  ? const Padding(
+                      padding: EdgeInsets.all(12),
+                      child: SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppTheme.accent)),
+                    )
+                  : IconButton(
+                      icon: const Icon(Icons.arrow_forward,
+                          color: AppTheme.accent),
+                      onPressed: _runSearch,
+                    ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+            ),
+          ),
+        ),
+        if (_results.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 6),
+            constraints: const BoxConstraints(maxHeight: 260),
+            decoration: BoxDecoration(
+              color: AppTheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(color: Colors.black45, blurRadius: 8),
+              ],
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: _results.length,
+              separatorBuilder: (_, __) =>
+                  Divider(height: 1, color: Colors.white.withOpacity(0.08)),
+              itemBuilder: (ctx, i) {
+                final r = _results[i];
+                return ListTile(
+                  dense: true,
+                  leading: const Icon(Icons.place_outlined,
+                      color: AppTheme.accent, size: 20),
+                  title: Text(
+                    r.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 13, color: Colors.white),
+                  ),
+                  onTap: () => _goTo(LatLng(r.lat, r.lng)),
+                );
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
   Widget _bottomBar() {
     return Container(
       color: Colors.black.withOpacity(0.72),
@@ -197,9 +359,9 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.open_with, size: 13, color: Colors.white38),
+              const Icon(Icons.touch_app, size: 13, color: Colors.white38),
               const SizedBox(width: 6),
-              Text('Geser peta untuk memindahkan pin',
+              Text('Ketuk peta atau geser untuk memindahkan pin',
                   style: TextStyle(
                       color: Colors.white.withOpacity(0.6), fontSize: 11)),
             ],

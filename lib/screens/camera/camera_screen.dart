@@ -1,5 +1,6 @@
 ﻿import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../models/capture_data.dart';
@@ -229,6 +230,43 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
+  Future<void> _importFromGallery() async {
+    if (_busy) return;
+    try {
+      final picker = ImagePicker();
+      final XFile? file = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 100,
+      );
+      if (file == null || !mounted) return;
+      setState(() => _busy = true);
+      await LogService.instance.log('Photo Imported');
+
+      final loc = await _resolveLocation();
+      if (!mounted) return;
+
+      final data = CaptureData(
+        rawImagePath: file.path,
+        latitude: loc.lat,
+        longitude: loc.lng,
+        accuracy: loc.acc,
+        address: loc.address,
+        timestampMs: DateTime.now().millisecondsSinceEpoch,
+        verificationCode: VerificationService.generate(),
+        locationAvailable: loc.available,
+      );
+      await DraftService.instance.save(data);
+      await _openPreview(data);
+    } catch (_) {
+      if (mounted) {
+        showAppMessage(context, 'Gagal membuka galeri. Silakan coba lagi.',
+            error: true);
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   Future<void> _openPreview(CaptureData data) async {
     final saved = await Navigator.of(context).push<bool>(
       MaterialPageRoute(builder: (_) => PreviewScreen(data: data)),
@@ -312,6 +350,11 @@ class _CameraScreenState extends State<CameraScreen>
         backgroundColor: Colors.black,
         title: const Text('TimeProof'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.add_photo_alternate_outlined),
+            tooltip: 'Import dari galeri',
+            onPressed: _busy ? null : _importFromGallery,
+          ),
           IconButton(
             icon: const Icon(Icons.photo_library_outlined),
             tooltip: 'Riwayat',
