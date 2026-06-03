@@ -1,7 +1,7 @@
 name: timeproof
 description: "TimeProof - Dokumentasi kehadiran & aktivitas kerja dengan bukti foto bertimestamp, lokasi, koordinat, dan kode verifikasi."
 publish_to: "none"
-version: 1.0.0+1
+version: 1.1.0+2
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -17,8 +17,10 @@ dependencies:
   geolocator: ^13.0.1
   geocoding: ^3.0.0
 
-  # Manual location picker (Google Maps SDK for Android - free tier)
-  google_maps_flutter: ^2.9.0
+  # Manual location picker — OpenStreetMap (flutter_map), TANPA API key.
+  # Bisa drag peta & pilih titik; murni Dart (tidak ada plugin native).
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
 
   # Files & paths
   path_provider: ^2.1.4

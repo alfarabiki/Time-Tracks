@@ -29,6 +29,9 @@ class _CameraScreenState extends State<CameraScreen>
   String? _initError;
   bool _busy = false;
 
+  List<CameraDescription> _cameras = const [];
+  CameraDescription? _current;
+
   MapPickResult? _manualLocation;
 
   @override
@@ -63,7 +66,7 @@ class _CameraScreenState extends State<CameraScreen>
     _checkDraft();
   }
 
-  Future<void> _initCamera() async {
+  Future<void> _initCamera({CameraDescription? camera}) async {
     setState(() {
       _initializing = true;
       _initError = null;
@@ -79,6 +82,7 @@ class _CameraScreenState extends State<CameraScreen>
       }
 
       final cameras = await availableCameras();
+      _cameras = cameras;
       if (cameras.isEmpty) {
         setState(() {
           _initializing = false;
@@ -87,13 +91,16 @@ class _CameraScreenState extends State<CameraScreen>
         return;
       }
 
-      final back = cameras.firstWhere(
-        (c) => c.lensDirection == CameraLensDirection.back,
-        orElse: () => cameras.first,
-      );
+      final chosen = camera ??
+          _current ??
+          cameras.firstWhere(
+            (c) => c.lensDirection == CameraLensDirection.back,
+            orElse: () => cameras.first,
+          );
+      _current = chosen;
 
       final controller = CameraController(
-        back,
+        chosen,
         ResolutionPreset.veryHigh, // 1080p minimum (Quality > Image Quality)
         enableAudio: false,
         imageFormatGroup: ImageFormatGroup.jpeg,
@@ -120,6 +127,24 @@ class _CameraScreenState extends State<CameraScreen>
         _initError = 'Kamera gagal terbuka. Silakan coba lagi.';
       });
     }
+  }
+
+  Future<void> _flipCamera() async {
+    if (_busy || _initializing || _cameras.length < 2) return;
+    final cur = _current;
+    CameraDescription next;
+    if (cur != null) {
+      next = _cameras.firstWhere(
+        (c) => c.lensDirection != cur.lensDirection,
+        orElse: () =>
+            _cameras[(_cameras.indexOf(cur) + 1) % _cameras.length],
+      );
+    } else {
+      next = _cameras.first;
+    }
+    await _controller?.dispose();
+    _controller = null;
+    await _initCamera(camera: next);
   }
 
   Future<void> _checkStorage() async {
@@ -361,6 +386,20 @@ class _CameraScreenState extends State<CameraScreen>
             child: CameraPreview(c),
           ),
         ),
+        if (_cameras.length >= 2)
+          Positioned(
+            top: 12,
+            right: 12,
+            child: Material(
+              color: Colors.black.withOpacity(0.5),
+              shape: const CircleBorder(),
+              child: IconButton(
+                icon: const Icon(Icons.flip_camera_android, color: Colors.white),
+                tooltip: 'Putar kamera (depan/belakang)',
+                onPressed: _busy ? null : _flipCamera,
+              ),
+            ),
+          ),
         if (_manualLocation != null)
           Positioned(
             top: 12,

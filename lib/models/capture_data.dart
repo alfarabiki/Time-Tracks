@@ -30,6 +30,7 @@ class CaptureData {
     double? longitude,
     double? accuracy,
     String? address,
+    int? timestampMs,
     bool? locationAvailable,
   }) {
     return CaptureData(
@@ -38,7 +39,7 @@ class CaptureData {
       longitude: longitude ?? this.longitude,
       accuracy: accuracy ?? this.accuracy,
       address: address ?? this.address,
-      timestampMs: timestampMs,
+      timestampMs: timestampMs ?? this.timestampMs,
       verificationCode: verificationCode,
       locationAvailable: locationAvailable ?? this.locationAvailable,
     );

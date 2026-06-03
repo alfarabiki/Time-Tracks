@@ -1,5 +1,6 @@
-﻿import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../services/geocoding_service.dart';
 import '../../services/location_service.dart';
@@ -14,7 +15,8 @@ class MapPickResult {
   const MapPickResult(this.lat, this.lng, this.address);
 }
 
-/// Manual Location Picker (Feature 8). Geser peta, pin tetap di tengah.
+/// Manual Location Picker (Feature 8) memakai OpenStreetMap via flutter_map.
+/// TANPA API key — geser peta, pin tetap di tengah, lalu konfirmasi.
 class MapPickerScreen extends StatefulWidget {
   final MapPickResult? initial;
   const MapPickerScreen({super.key, this.initial});
@@ -26,7 +28,7 @@ class MapPickerScreen extends StatefulWidget {
 class _MapPickerScreenState extends State<MapPickerScreen> {
   static const LatLng _fallback = LatLng(-6.185037, 106.863431); // Jakarta
 
-  GoogleMapController? _map;
+  final MapController _map = MapController();
   LatLng _center = _fallback;
   bool _resolving = false;
   bool _loading = true;
@@ -40,7 +42,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
   Future<void> _initCenter() async {
     if (widget.initial != null) {
       _center = LatLng(widget.initial!.lat, widget.initial!.lng);
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
       return;
     }
     final res = await LocationService.instance.getCurrent();
@@ -76,14 +78,14 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
           children: [
             TextField(
               controller: latC,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true, signed: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true, signed: true),
               decoration: const InputDecoration(labelText: 'Latitude'),
             ),
             TextField(
               controller: lngC,
-              keyboardType:
-                  const TextInputType.numberWithOptions(decimal: true, signed: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true, signed: true),
               decoration: const InputDecoration(labelText: 'Longitude'),
             ),
           ],
@@ -103,7 +105,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
       final lng = double.tryParse(lngC.text.trim());
       if (lat != null && lng != null && lat.abs() <= 90 && lng.abs() <= 180) {
         setState(() => _center = LatLng(lat, lng));
-        await _map?.animateCamera(CameraUpdate.newLatLng(_center));
+        _map.move(_center, _map.camera.zoom);
       } else if (mounted) {
         showAppMessage(context, 'Koordinat tidak valid.', error: true);
       }
@@ -129,21 +131,50 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
           : Stack(
               alignment: Alignment.center,
               children: [
-                GoogleMap(
-                  initialCameraPosition:
-                      CameraPosition(target: _center, zoom: 16),
-                  myLocationButtonEnabled: true,
-                  myLocationEnabled: false,
-                  zoomControlsEnabled: false,
-                  onMapCreated: (c) => _map = c,
-                  onCameraMove: (pos) => _center = pos.target,
-                  onCameraIdle: () => setState(() {}),
+                FlutterMap(
+                  mapController: _map,
+                  options: MapOptions(
+                    initialCenter: _center,
+                    initialZoom: 16,
+                    minZoom: 3,
+                    maxZoom: 19,
+                    onPositionChanged: (camera, hasGesture) {
+                      _center = camera.center;
+                      if (hasGesture) setState(() {});
+                    },
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.timeproof.app',
+                      maxZoom: 19,
+                    ),
+                  ],
                 ),
                 // Pin tetap di tengah layar.
                 const Padding(
                   padding: EdgeInsets.only(bottom: 36),
                   child: Icon(Icons.location_on,
                       color: AppTheme.accent, size: 48),
+                ),
+                // Tombol "lokasi saya"
+                Positioned(
+                  right: 14,
+                  bottom: 130,
+                  child: FloatingActionButton.small(
+                    backgroundColor: AppTheme.surface,
+                    onPressed: () async {
+                      final res = await LocationService.instance.getCurrent();
+                      if (res.ok && mounted) {
+                        _center = LatLng(
+                            res.position!.latitude, res.position!.longitude);
+                        _map.move(_center, 16);
+                        setState(() {});
+                      }
+                    },
+                    child: const Icon(Icons.my_location, color: Colors.white),
+                  ),
                 ),
                 Positioned(
                   left: 0,
@@ -158,11 +189,22 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
 
   Widget _bottomBar() {
     return Container(
-      color: Colors.black.withOpacity(0.7),
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 22),
+      color: Colors.black.withOpacity(0.72),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 22),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.open_with, size: 13, color: Colors.white38),
+              const SizedBox(width: 6),
+              Text('Geser peta untuk memindahkan pin',
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.6), fontSize: 11)),
+            ],
+          ),
+          const SizedBox(height: 8),
           Text(
             FormatUtils.coordinates(_center.latitude, _center.longitude),
             style: const TextStyle(color: Colors.white, fontSize: 15),
@@ -186,11 +228,5 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _map?.dispose();
-    super.dispose();
   }
 }

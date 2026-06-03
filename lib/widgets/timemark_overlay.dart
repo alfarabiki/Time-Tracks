@@ -86,10 +86,15 @@ class TimemarkOverlay extends StatelessWidget {
                           shadows: shadows,
                         ),
                         SizedBox(width: s(0.012)),
-                        Text(
-                          '$code   ${settings.verifiedLabel}',
-                          style: style(0.024).copyWith(
-                            color: Colors.white.withOpacity(0.92),
+                        Flexible(
+                          child: Text(
+                            '$code   ${settings.verifiedLabel}',
+                            maxLines: 1,
+                            softWrap: false,
+                            overflow: TextOverflow.fade,
+                            style: style(0.024).copyWith(
+                              color: Colors.white.withOpacity(0.92),
+                            ),
                           ),
                         ),
                       ],

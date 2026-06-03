@@ -25,12 +25,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
-        <!-- ===== Google Maps API Key =====
-             Key disimpan di res/values/secrets.xml (lihat README untuk cara membuat
-             key gratis di Google Cloud Platform). -->
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+        <!-- Map picker memakai OpenStreetMap (flutter_map) — tidak perlu API key. -->
 
         <activity
             android:name=".MainActivity"
