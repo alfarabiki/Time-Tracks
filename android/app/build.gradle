@@ -38,11 +38,25 @@ android {
         versionName = flutterVersionName
     }
 
+    signingConfigs {
+        release {
+            // MVP: pakai debug keystore (auto-generated). Ganti dgn keystore
+            // produksi sebelum publish ke Play Store.
+            storeFile file("${System.properties['user.home']}/.android/debug.keystore")
+            storePassword "android"
+            keyAlias "androiddebugkey"
+            keyPassword "android"
+            // Aktifkan SEMUA skema agar terpasang di seluruh perangkat/ROM
+            // (beberapa installer OEM menolak APK tanpa v1 dgn "App not installed").
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = true
+        }
+    }
+
     buildTypes {
         release {
-            // Untuk MVP pakai debug signing agar bisa langsung `flutter run --release`.
-            // Ganti dengan release keystore sebelum publish ke Play Store.
-            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.release
             minifyEnabled = false
             shrinkResources = false
         }
