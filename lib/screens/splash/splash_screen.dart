@@ -1,7 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 
 import '../../utils/app_theme.dart';
-import '../../utils/constants.dart';
 import '../camera/camera_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -34,26 +33,16 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(22),
-              decoration: BoxDecoration(
-                color: AppTheme.surface,
-                borderRadius: BorderRadius.circular(28),
-              ),
-              child: const Icon(Icons.verified_user_rounded,
-                  size: 64, color: AppTheme.accent),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              K.appName,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-                letterSpacing: 0.5,
+            ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: Image.asset(
+                'assets/icon/logo.png',
+                width: 140,
+                height: 140,
+                fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 20),
             Text(
               'Bukti foto terverifikasi',
               style: TextStyle(color: Colors.white.withOpacity(0.6)),
