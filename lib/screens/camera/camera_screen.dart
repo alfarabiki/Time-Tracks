@@ -418,17 +418,23 @@ class _CameraScreenState extends State<CameraScreen>
     }
 
     final c = _controller!;
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        FittedBox(
-          fit: BoxFit.cover,
-          child: SizedBox(
-            width: c.value.previewSize?.height ?? 1080,
-            height: c.value.previewSize?.width ?? 1920,
-            child: CameraPreview(c),
-          ),
-        ),
+    // Pratinjau dikunci 3:4 (potrait) agar sama persis dengan hasil foto (WYSIWYG).
+    return Center(
+      child: AspectRatio(
+        aspectRatio: 3 / 4,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ClipRect(
+              child: FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: c.value.previewSize?.height ?? 1080,
+                  height: c.value.previewSize?.width ?? 1920,
+                  child: CameraPreview(c),
+                ),
+              ),
+            ),
         if (_cameras.length >= 2)
           Positioned(
             top: 12,
@@ -473,7 +479,9 @@ class _CameraScreenState extends State<CameraScreen>
               ),
             ),
           ),
-      ],
+          ],
+        ),
+      ),
     );
   }
 

@@ -1,7 +1,7 @@
 name: timeproof
 description: "TimeProof - Dokumentasi kehadiran & aktivitas kerja dengan bukti foto bertimestamp, lokasi, koordinat, dan kode verifikasi."
 publish_to: "none"
-version: 1.1.2+4
+version: 1.2.0+5
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -75,3 +75,18 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icon/logo.png
+  # Font di-bundle agar overlay konsisten di semua HP (tidak ikut font sistem
+  # seperti MiSans di Xiaomi). Variable font: bobot diatur via fontWeight.
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto.ttf
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter.ttf
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat.ttf
+    - family: Oswald
+      fonts:
+        - asset: assets/fonts/Oswald.ttf

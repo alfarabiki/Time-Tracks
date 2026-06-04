@@ -24,9 +24,11 @@ class PreviewScreen extends StatefulWidget {
 class _PreviewScreenState extends State<PreviewScreen> {
   final GlobalKey _boundaryKey = GlobalKey();
 
+  // Rasio foto hasil dikunci 3:4 (potrait). Foto di-crop tengah (cover) ke 3:4.
+  static const double _kAspect = 3 / 4; // w/h
+
   bool _loadingImage = true;
   bool _saving = false;
-  double _aspect = 3 / 4; // w/h
   int _originalWidth = 1080;
 
   // Data & pengaturan yang bisa diedit (live) sebelum disimpan.
@@ -49,8 +51,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
       final img = frame.image;
       if (!mounted) return;
       setState(() {
-        _originalWidth = img.width;
-        _aspect = img.width / img.height;
+        // Basis resolusi: pakai sisi terbesar agar crop 3:4 tetap tajam.
+        _originalWidth = img.width > img.height ? img.width : img.height;
         _loadingImage = false;
       });
       img.dispose();
@@ -332,7 +334,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                           child: RepaintBoundary(
                             key: _boundaryKey,
                             child: AspectRatio(
-                              aspectRatio: _aspect,
+                              aspectRatio: _kAspect,
                               child: Stack(
                                 fit: StackFit.expand,
                                 children: [

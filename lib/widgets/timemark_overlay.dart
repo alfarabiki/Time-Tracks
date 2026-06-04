@@ -34,15 +34,16 @@ class TimemarkOverlay extends StatelessWidget {
           ),
         ];
 
+        final fontScale = settings.fontSize.scale;
         TextStyle style(double frac, {FontWeight weight = FontWeight.w400}) {
           return TextStyle(
             color: Colors.white,
-            fontSize: s(frac),
+            fontSize: s(frac) * fontScale,
             fontWeight: weight,
             height: 1.25,
             shadows: shadows,
-            // Roboto = default Android; eksplisit agar konsisten lintas versi.
-            fontFamily: 'Roboto',
+            // Font di-bundle (assets/fonts) agar konsisten di semua HP.
+            fontFamily: settings.fontFamily,
           );
         }
 

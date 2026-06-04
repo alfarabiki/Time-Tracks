@@ -22,6 +22,21 @@ enum ImageQuality {
   const ImageQuality(this.jpegQuality);
 }
 
+/// Ukuran font overlay (faktor skala terhadap default).
+enum FontSizeOption {
+  small(0.82, 'Kecil'),
+  medium(1.0, 'Sedang'),
+  large(1.22, 'Besar'),
+  xlarge(1.45, 'Besar+');
+
+  final double scale;
+  final String label;
+  const FontSizeOption(this.scale, this.label);
+}
+
+/// Jenis font overlay yang tersedia (di-bundle di assets/fonts).
+const List<String> kOverlayFonts = ['Roboto', 'Inter', 'Montserrat', 'Oswald'];
+
 /// Konfigurasi overlay + preferensi aplikasi. Disimpan via shared_preferences.
 class OverlaySettings {
   final bool showTime;
@@ -41,6 +56,10 @@ class OverlaySettings {
 
   final ImageQuality imageQuality;
 
+  /// Ukuran & jenis font overlay.
+  final FontSizeOption fontSize;
+  final String fontFamily;
+
   const OverlaySettings({
     this.showTime = true,
     this.showAddress = true,
@@ -54,6 +73,8 @@ class OverlaySettings {
     this.cameraLabel = 'Kamera',
     this.verifiedLabel = 'Timemark Verified',
     this.imageQuality = ImageQuality.medium,
+    this.fontSize = FontSizeOption.medium,
+    this.fontFamily = 'Roboto',
   });
 
   OverlaySettings copyWith({
@@ -69,6 +90,8 @@ class OverlaySettings {
     String? cameraLabel,
     String? verifiedLabel,
     ImageQuality? imageQuality,
+    FontSizeOption? fontSize,
+    String? fontFamily,
   }) {
     return OverlaySettings(
       showTime: showTime ?? this.showTime,
@@ -83,6 +106,8 @@ class OverlaySettings {
       cameraLabel: cameraLabel ?? this.cameraLabel,
       verifiedLabel: verifiedLabel ?? this.verifiedLabel,
       imageQuality: imageQuality ?? this.imageQuality,
+      fontSize: fontSize ?? this.fontSize,
+      fontFamily: fontFamily ?? this.fontFamily,
     );
   }
 
@@ -99,6 +124,8 @@ class OverlaySettings {
         'cameraLabel': cameraLabel,
         'verifiedLabel': verifiedLabel,
         'imageQuality': imageQuality.name,
+        'fontSize': fontSize.name,
+        'fontFamily': fontFamily,
       };
 
   factory OverlaySettings.fromJson(Map<String, Object?> j) {
@@ -121,6 +148,13 @@ class OverlaySettings {
         (q) => q.name == j['imageQuality'],
         orElse: () => ImageQuality.medium,
       ),
+      fontSize: FontSizeOption.values.firstWhere(
+        (f) => f.name == j['fontSize'],
+        orElse: () => FontSizeOption.medium,
+      ),
+      fontFamily: kOverlayFonts.contains(j['fontFamily'])
+          ? j['fontFamily'] as String
+          : 'Roboto',
     );
   }
 

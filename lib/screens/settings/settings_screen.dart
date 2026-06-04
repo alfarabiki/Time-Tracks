@@ -89,6 +89,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _qualitySelector(),
 
           const SizedBox(height: 16),
+          _section('Ukuran Font Overlay'),
+          _fontSizeSelector(),
+
+          const SizedBox(height: 16),
+          _section('Jenis Font Overlay'),
+          _fontFamilySelector(),
+
+          const SizedBox(height: 16),
           _section('Branding Overlay'),
           _textField(
             _brand,
@@ -158,6 +166,43 @@ class _SettingsScreenState extends State<SettingsScreen> {
       selected: {_s.imageQuality},
       onSelectionChanged: (sel) =>
           _update(_s.copyWith(imageQuality: sel.first)),
+    );
+  }
+
+  Widget _fontSizeSelector() {
+    return SegmentedButton<FontSizeOption>(
+      segments: FontSizeOption.values
+          .map((f) => ButtonSegment(value: f, label: Text(f.label)))
+          .toList(),
+      selected: {_s.fontSize},
+      showSelectedIcon: false,
+      onSelectionChanged: (sel) => _update(_s.copyWith(fontSize: sel.first)),
+    );
+  }
+
+  Widget _fontFamilySelector() {
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: kOverlayFonts.map((f) {
+        final selected = _s.fontFamily == f;
+        return ChoiceChip(
+          selected: selected,
+          showCheckmark: false,
+          selectedColor: AppTheme.accent,
+          backgroundColor: AppTheme.surface,
+          label: Text(
+            f,
+            style: TextStyle(
+              fontFamily: f,
+              fontSize: 16,
+              color: selected ? Colors.black : Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          onSelected: (_) => _update(_s.copyWith(fontFamily: f)),
+        );
+      }).toList(),
     );
   }
 
