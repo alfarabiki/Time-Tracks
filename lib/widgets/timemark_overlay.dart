@@ -69,6 +69,8 @@ class TimemarkOverlay extends StatelessWidget {
             ),
 
             // ===== RIGHT EDGE: Verified vertikal =====
+            // Ukuran label "Verified" independen dari fontSize global
+            // (pakai verifiedSize), agar bisa dikecil/besarkan sendiri.
             if (settings.showVerification)
               Positioned(
                 top: 0,
@@ -82,7 +84,7 @@ class TimemarkOverlay extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.verified_user_outlined,
-                          size: s(0.030),
+                          size: s(0.030) * settings.verifiedSize.scale,
                           color: Colors.white.withOpacity(0.9),
                           shadows: shadows,
                         ),
@@ -94,6 +96,7 @@ class TimemarkOverlay extends StatelessWidget {
                             softWrap: false,
                             overflow: TextOverflow.fade,
                             style: style(0.024).copyWith(
+                              fontSize: s(0.024) * settings.verifiedSize.scale,
                               color: Colors.white.withOpacity(0.92),
                             ),
                           ),

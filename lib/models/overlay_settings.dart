@@ -60,6 +60,9 @@ class OverlaySettings {
   final FontSizeOption fontSize;
   final String fontFamily;
 
+  /// Ukuran khusus label "Verified" vertikal (kanan), independen dari fontSize.
+  final FontSizeOption verifiedSize;
+
   const OverlaySettings({
     this.showTime = true,
     this.showAddress = true,
@@ -75,6 +78,7 @@ class OverlaySettings {
     this.imageQuality = ImageQuality.medium,
     this.fontSize = FontSizeOption.medium,
     this.fontFamily = 'Roboto',
+    this.verifiedSize = FontSizeOption.medium,
   });
 
   OverlaySettings copyWith({
@@ -92,6 +96,7 @@ class OverlaySettings {
     ImageQuality? imageQuality,
     FontSizeOption? fontSize,
     String? fontFamily,
+    FontSizeOption? verifiedSize,
   }) {
     return OverlaySettings(
       showTime: showTime ?? this.showTime,
@@ -108,6 +113,7 @@ class OverlaySettings {
       imageQuality: imageQuality ?? this.imageQuality,
       fontSize: fontSize ?? this.fontSize,
       fontFamily: fontFamily ?? this.fontFamily,
+      verifiedSize: verifiedSize ?? this.verifiedSize,
     );
   }
 
@@ -126,6 +132,7 @@ class OverlaySettings {
         'imageQuality': imageQuality.name,
         'fontSize': fontSize.name,
         'fontFamily': fontFamily,
+        'verifiedSize': verifiedSize.name,
       };
 
   factory OverlaySettings.fromJson(Map<String, Object?> j) {
@@ -155,6 +162,10 @@ class OverlaySettings {
       fontFamily: kOverlayFonts.contains(j['fontFamily'])
           ? j['fontFamily'] as String
           : 'Roboto',
+      verifiedSize: FontSizeOption.values.firstWhere(
+        (f) => f.name == j['verifiedSize'],
+        orElse: () => FontSizeOption.medium,
+      ),
     );
   }
 

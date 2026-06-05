@@ -93,6 +93,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _fontSizeSelector(),
 
           const SizedBox(height: 16),
+          _section("Ukuran Teks 'Verified' (kanan)"),
+          _verifiedSizeSelector(),
+
+          const SizedBox(height: 16),
           _section('Jenis Font Overlay'),
           _fontFamilySelector(),
 
@@ -177,6 +181,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       selected: {_s.fontSize},
       showSelectedIcon: false,
       onSelectionChanged: (sel) => _update(_s.copyWith(fontSize: sel.first)),
+    );
+  }
+
+  Widget _verifiedSizeSelector() {
+    return SegmentedButton<FontSizeOption>(
+      segments: FontSizeOption.values
+          .map((f) => ButtonSegment(value: f, label: Text(f.label)))
+          .toList(),
+      selected: {_s.verifiedSize},
+      showSelectedIcon: false,
+      onSelectionChanged: (sel) => _update(_s.copyWith(verifiedSize: sel.first)),
     );
   }
 
