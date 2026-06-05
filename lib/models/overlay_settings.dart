@@ -37,6 +37,25 @@ enum FontSizeOption {
 /// Jenis font overlay yang tersedia (di-bundle di assets/fonts).
 const List<String> kOverlayFonts = ['Roboto', 'Inter', 'Montserrat', 'Oswald'];
 
+/// Gaya watermark kanan-atas (meniru Timemark).
+/// - [kamera]: brand putih + sub-label "Kamera".
+/// - [akurat]: brand dwiwarna ("mark" kuning) + sub-label "Foto 100% akurat".
+enum WatermarkStyle {
+  kamera('Kamera', false, 'Timemark Kamera'),
+  akurat('Foto 100% akurat', true, 'Foto 100% akurat');
+
+  /// Sub-label di bawah brand.
+  final String sublabel;
+
+  /// Apakah bagian "mark" pada brand diwarnai aksen (kuning).
+  final bool twoTone;
+
+  /// Label pilihan di layar Pengaturan.
+  final String optionLabel;
+
+  const WatermarkStyle(this.sublabel, this.twoTone, this.optionLabel);
+}
+
 /// Konfigurasi overlay + preferensi aplikasi. Disimpan via shared_preferences.
 class OverlaySettings {
   final bool showTime;
@@ -63,6 +82,15 @@ class OverlaySettings {
   /// Ukuran khusus label "Verified" vertikal (kanan), independen dari fontSize.
   final FontSizeOption verifiedSize;
 
+  /// Watermark kanan-atas (brand + sub-label). Bisa dimatikan ("Remove Watermark").
+  final bool showWatermark;
+
+  /// Ukuran watermark kanan-atas, independen dari fontSize blok info.
+  final FontSizeOption brandSize;
+
+  /// Gaya watermark kanan-atas.
+  final WatermarkStyle watermarkStyle;
+
   const OverlaySettings({
     this.showTime = true,
     this.showAddress = true,
@@ -79,6 +107,9 @@ class OverlaySettings {
     this.fontSize = FontSizeOption.medium,
     this.fontFamily = 'Roboto',
     this.verifiedSize = FontSizeOption.medium,
+    this.showWatermark = true,
+    this.brandSize = FontSizeOption.medium,
+    this.watermarkStyle = WatermarkStyle.kamera,
   });
 
   OverlaySettings copyWith({
@@ -97,6 +128,9 @@ class OverlaySettings {
     FontSizeOption? fontSize,
     String? fontFamily,
     FontSizeOption? verifiedSize,
+    bool? showWatermark,
+    FontSizeOption? brandSize,
+    WatermarkStyle? watermarkStyle,
   }) {
     return OverlaySettings(
       showTime: showTime ?? this.showTime,
@@ -114,6 +148,9 @@ class OverlaySettings {
       fontSize: fontSize ?? this.fontSize,
       fontFamily: fontFamily ?? this.fontFamily,
       verifiedSize: verifiedSize ?? this.verifiedSize,
+      showWatermark: showWatermark ?? this.showWatermark,
+      brandSize: brandSize ?? this.brandSize,
+      watermarkStyle: watermarkStyle ?? this.watermarkStyle,
     );
   }
 
@@ -133,6 +170,9 @@ class OverlaySettings {
         'fontSize': fontSize.name,
         'fontFamily': fontFamily,
         'verifiedSize': verifiedSize.name,
+        'showWatermark': showWatermark,
+        'brandSize': brandSize.name,
+        'watermarkStyle': watermarkStyle.name,
       };
 
   factory OverlaySettings.fromJson(Map<String, Object?> j) {
@@ -165,6 +205,15 @@ class OverlaySettings {
       verifiedSize: FontSizeOption.values.firstWhere(
         (f) => f.name == j['verifiedSize'],
         orElse: () => FontSizeOption.medium,
+      ),
+      showWatermark: (j['showWatermark'] ?? true) as bool,
+      brandSize: FontSizeOption.values.firstWhere(
+        (f) => f.name == j['brandSize'],
+        orElse: () => FontSizeOption.medium,
+      ),
+      watermarkStyle: WatermarkStyle.values.firstWhere(
+        (w) => w.name == j['watermarkStyle'],
+        orElse: () => WatermarkStyle.kamera,
       ),
     );
   }

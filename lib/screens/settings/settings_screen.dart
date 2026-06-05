@@ -89,7 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _qualitySelector(),
 
           const SizedBox(height: 16),
-          _section('Ukuran Font Overlay'),
+          _section('Ukuran Teks Info (tanggal, alamat, dll)'),
           _fontSizeSelector(),
 
           const SizedBox(height: 16),
@@ -99,6 +99,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 16),
           _section('Jenis Font Overlay'),
           _fontFamilySelector(),
+
+          const SizedBox(height: 16),
+          _section('Watermark (kanan-atas)'),
+          _switchTile(
+            'Remove Watermark',
+            !_s.showWatermark,
+            (v) => _update(_s.copyWith(showWatermark: !v)),
+          ),
+          const SizedBox(height: 8),
+          _watermarkStyleSelector(),
+          const SizedBox(height: 14),
+          _section('Ukuran Watermark'),
+          _brandSizeSelector(),
 
           const SizedBox(height: 16),
           _section('Branding Overlay'),
@@ -192,6 +205,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
       selected: {_s.verifiedSize},
       showSelectedIcon: false,
       onSelectionChanged: (sel) => _update(_s.copyWith(verifiedSize: sel.first)),
+    );
+  }
+
+  Widget _brandSizeSelector() {
+    return SegmentedButton<FontSizeOption>(
+      segments: FontSizeOption.values
+          .map((f) => ButtonSegment(value: f, label: Text(f.label)))
+          .toList(),
+      selected: {_s.brandSize},
+      showSelectedIcon: false,
+      onSelectionChanged: (sel) => _update(_s.copyWith(brandSize: sel.first)),
+    );
+  }
+
+  Widget _watermarkStyleSelector() {
+    return Column(
+      children: WatermarkStyle.values.map((w) {
+        return RadioListTile<WatermarkStyle>(
+          value: w,
+          groupValue: _s.watermarkStyle,
+          activeColor: AppTheme.accent,
+          contentPadding: EdgeInsets.zero,
+          title: Text(w.optionLabel, style: const TextStyle(fontSize: 14)),
+          subtitle: Text('Sub-label: "${w.sublabel}"',
+              style: const TextStyle(fontSize: 12)),
+          onChanged: (v) {
+            if (v != null) _update(_s.copyWith(watermarkStyle: v));
+          },
+        );
+      }).toList(),
     );
   }
 

@@ -51,22 +51,29 @@ class TimemarkOverlay extends StatelessWidget {
 
         return Stack(
           children: [
-            // ===== TOP-RIGHT: Brand =====
-            Positioned(
-              top: s(0.03),
-              right: s(0.035),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(settings.brandName, style: style(0.050, weight: FontWeight.w700)),
-                  Padding(
-                    padding: EdgeInsets.only(top: s(0.004)),
-                    child: Text(settings.cameraLabel, style: style(0.032)),
-                  ),
-                ],
+            // ===== TOP-RIGHT: Watermark (brand + sub-label) =====
+            // Ukuran independen (brandSize) & bisa dimatikan ("Remove Watermark").
+            if (settings.showWatermark)
+              Positioned(
+                top: s(0.03),
+                right: s(0.035),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _brand(s, shadows),
+                    Padding(
+                      padding: EdgeInsets.only(top: s(0.004)),
+                      child: Text(
+                        settings.watermarkStyle.sublabel,
+                        style: style(0.032).copyWith(
+                          fontSize: s(0.032) * settings.brandSize.scale,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
 
             // ===== RIGHT EDGE: Verified vertikal =====
             // Ukuran label "Verified" independen dari fontSize global
@@ -155,19 +162,25 @@ class TimemarkOverlay extends StatelessWidget {
                         Icon(
                           Icons.verified_user_outlined,
                           size: s(0.040),
-                          color: Colors.white.withOpacity(0.9),
+                          color: Colors.white.withOpacity(0.6),
                           shadows: shadows,
                         ),
                         SizedBox(width: s(0.020)),
                         Flexible(
+                          // Wording "Kode Foto" semi-transparan (mengikuti contoh).
                           child: RichText(
                             text: TextSpan(
-                              style: style(0.034),
+                              style: style(0.034).copyWith(
+                                color: Colors.white.withOpacity(0.62),
+                              ),
                               children: [
                                 const TextSpan(text: 'Kode Foto: '),
                                 TextSpan(
                                   text: code,
-                                  style: style(0.034, weight: FontWeight.w700),
+                                  style: style(0.034, weight: FontWeight.w700)
+                                      .copyWith(
+                                    color: Colors.white.withOpacity(0.82),
+                                  ),
                                 ),
                               ],
                             ),
@@ -182,6 +195,38 @@ class TimemarkOverlay extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+
+  /// Brand watermark kanan-atas. Bila gaya dwiwarna, bagian "mark" diberi aksen.
+  Widget _brand(double Function(double) s, List<Shadow> shadows) {
+    final scale = settings.brandSize.scale;
+    final base = TextStyle(
+      color: Colors.white,
+      fontSize: s(0.050) * scale,
+      fontWeight: FontWeight.w700,
+      height: 1.05,
+      shadows: shadows,
+      fontFamily: settings.fontFamily,
+    );
+    final name = settings.brandName;
+    final idx = settings.watermarkStyle.twoTone
+        ? name.toLowerCase().lastIndexOf('mark')
+        : -1;
+    if (idx < 0) return Text(name, style: base);
+    return RichText(
+      textAlign: TextAlign.end,
+      text: TextSpan(
+        style: base,
+        children: [
+          TextSpan(text: name.substring(0, idx)),
+          TextSpan(
+            text: name.substring(idx, idx + 4),
+            style: const TextStyle(color: Color(0xFFF5A623)),
+          ),
+          TextSpan(text: name.substring(idx + 4)),
+        ],
+      ),
     );
   }
 
