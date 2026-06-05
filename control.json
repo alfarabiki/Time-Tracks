@@ -1,0 +1,7 @@
+{
+  "_comment": "Kontrol jarak-jauh TimeProof. Edit file ini lalu `git push` ke main. App membacanya saat dibuka (raw.githubusercontent). killed=true menonaktifkan app; minVersionName memaksa update untuk versi di bawahnya.",
+  "killed": false,
+  "killMessage": "Aplikasi sedang dinonaktifkan sementara. Silakan hubungi admin.",
+  "minVersionName": "1.0.0",
+  "forceUpdateMessage": "Versi ini sudah tidak didukung. Silakan update untuk melanjutkan."
+}

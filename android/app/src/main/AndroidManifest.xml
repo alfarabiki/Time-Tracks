@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Auto-update: pasang APK pembaruan dari dalam app -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- Galeri: Android 13+ (API 33) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
@@ -54,6 +56,11 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT" />
             <data android:mimeType="text/plain" />
+        </intent>
+        <!-- Buka installer APK (auto-update) di Android 11+ -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="application/vnd.android.package-archive" />
         </intent>
     </queries>
 </manifest>

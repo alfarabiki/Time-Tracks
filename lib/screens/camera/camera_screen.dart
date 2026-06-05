@@ -9,6 +9,7 @@ import '../../services/geocoding_service.dart';
 import '../../services/location_service.dart';
 import '../../services/log_service.dart';
 import '../../services/storage_service.dart';
+import '../../services/update_service.dart';
 import '../../services/verification_service.dart';
 import '../../utils/app_theme.dart';
 import '../history/history_screen.dart';
@@ -65,6 +66,8 @@ class _CameraScreenState extends State<CameraScreen>
     if (!mounted) return;
     _checkStorage();
     _checkDraft();
+    // Cek pembaruan / kill switch (sekali per sesi, aman saat offline).
+    UpdateService.instance.runGate(context);
   }
 
   Future<void> _initCamera({CameraDescription? camera}) async {
