@@ -30,3 +30,7 @@ android/app/src/main/res/values/secrets.xml
 
 # local downloads
 *.zip
+
+# scratch / verification artifacts
+_*.png
+_*.xml
