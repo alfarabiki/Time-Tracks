@@ -219,11 +219,12 @@ class TimemarkOverlay extends StatelessWidget {
       text: TextSpan(
         style: base,
         children: [
-          TextSpan(text: name.substring(0, idx)),
+          // "Time" (sebelum "mark") = kuning, "mark" & sisanya = putih.
           TextSpan(
-            text: name.substring(idx, idx + 4),
+            text: name.substring(0, idx),
             style: const TextStyle(color: Color(0xFFF5A623)),
           ),
+          TextSpan(text: name.substring(idx, idx + 4)),
           TextSpan(text: name.substring(idx + 4)),
         ],
       ),
