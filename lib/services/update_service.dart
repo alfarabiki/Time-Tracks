@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
@@ -102,7 +103,7 @@ class UpdateService {
         final j = jsonDecode(r.body) as Map<String, dynamic>;
         latest = (j['tag_name'] ?? '').toString();
         notes = (j['body'] ?? '').toString();
-        apkUrl = _pickApkUrl((j['assets'] as List?) ?? const []);
+        apkUrl = await _pickApkUrl((j['assets'] as List?) ?? const []);
       }
     } catch (_) {/* offline */}
 
@@ -140,19 +141,58 @@ class UpdateService {
     );
   }
 
-  /// Pilih APK universal (cocok semua arsitektur); fallback arm64.
-  String? _pickApkUrl(List<dynamic> assets) {
-    String? urlFor(String part) {
-      for (final a in assets) {
-        final name = (a['name'] ?? '').toString();
-        if (name.contains(part)) {
-          return (a['browser_download_url'] ?? '').toString();
-        }
+  /// Pilih APK yang COCOK dengan arsitektur perangkat.
+  ///
+  /// PENTING: APK per-arsitektur (arm64/armeabi/x86_64) punya versionCode lebih
+  /// tinggi daripada "universal" (offset ABI dari Flutter). Memasang universal
+  /// di atas instalasi per-arsitektur dianggap "downgrade/paket tidak valid".
+  /// Karena itu kita unduh varian yang sama arsitekturnya; universal hanya
+  /// fallback terakhir.
+  Future<String?> _pickApkUrl(List<dynamic> assets) async {
+    final names =
+        assets.map((a) => (a['name'] ?? '').toString()).toList(growable: false);
+    List<String> abis = const [];
+    try {
+      abis = (await DeviceInfoPlugin().androidInfo).supportedAbis;
+    } catch (_) {/* pakai fallback */}
+    final chosen = selectApkAssetName(abis, names);
+    if (chosen == null) return null;
+    for (final a in assets) {
+      if ((a['name'] ?? '').toString() == chosen) {
+        return (a['browser_download_url'] ?? '').toString();
+      }
+    }
+    return null;
+  }
+
+  /// Pilih nama asset APK sesuai ABI perangkat (pure & testable).
+  /// Prioritas: arm64 > armeabi-v7a > x86_64; fallback arm64 lalu universal.
+  /// Sengaja MENGHINDARI "universal" untuk perangkat ber-ABI dikenal, karena
+  /// versionCode universal lebih rendah → dianggap downgrade/paket tidak valid.
+  static String? selectApkAssetName(
+    List<String> abis,
+    List<String> assetNames,
+  ) {
+    String? has(String part) {
+      for (final n in assetNames) {
+        if (n.contains(part)) return n;
       }
       return null;
     }
 
-    return urlFor('universal') ?? urlFor('arm64-v8a');
+    if (abis.contains('arm64-v8a')) {
+      final m = has('arm64-v8a');
+      if (m != null) return m;
+    }
+    if (abis.contains('armeabi-v7a')) {
+      final m = has('armeabi-v7a');
+      if (m != null) return m;
+    }
+    if (abis.any((a) => a.contains('x86_64'))) {
+      final m = has('x86_64');
+      if (m != null) return m;
+    }
+    return has('arm64-v8a') ?? has('universal');
   }
 
   /// Jalankan "gerbang" pengecekan saat app dibuka (sekali per sesi).
@@ -169,7 +209,7 @@ class UpdateService {
     await LogService.instance.log(
       'Update Check',
       detail:
-          '${info.action.name} cur=${info.currentVersion} latest=${info.latestVersion ?? "-"} apk=${info.apkUrl != null}',
+          '${info.action.name} cur=${info.currentVersion} latest=${info.latestVersion ?? "-"} apk=${info.apkUrl?.split('/').last ?? "-"}',
     );
     if (!context.mounted) return;
 
@@ -331,6 +371,16 @@ class UpdateService {
       }
       await sink.flush();
       await sink.close();
+
+      // Integritas: tolak unduhan tak lengkap / bukan APK (cegah "paket tidak valid").
+      final len = await file.length();
+      if (total > 0 && len != total) {
+        throw Exception('Unduhan tidak lengkap ($len/$total B)');
+      }
+      if (len < 1024 * 1024) {
+        throw Exception('Berkas pembaruan tidak valid ($len B)');
+      }
+      await LogService.instance.log('Update Download OK', detail: '$len B');
       return file;
     } finally {
       client.close();
