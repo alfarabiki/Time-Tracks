@@ -25,7 +25,7 @@ class DatabaseService {
     final path = p.join(dbDir, 'timeproof.db');
     return openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE $_table(
@@ -38,13 +38,33 @@ class DatabaseService {
             timestamp INTEGER NOT NULL,
             verification_code TEXT,
             custom_text TEXT,
-            image_hash TEXT
+            image_hash TEXT,
+            staff_name TEXT,
+            facility TEXT,
+            visit_type TEXT,
+            tracking_number TEXT
           )
         ''');
         // Index untuk history cepat (target < 1 detik utk ribuan data).
         await db.execute(
           'CREATE INDEX idx_timestamp ON $_table(timestamp DESC)',
         );
+      },
+      onUpgrade: (db, oldV, newV) async {
+        if (oldV < 2) {
+          for (final col in const [
+            'staff_name',
+            'facility',
+            'visit_type',
+            'tracking_number',
+          ]) {
+            try {
+              await db.execute('ALTER TABLE $_table ADD COLUMN $col TEXT');
+            } catch (_) {
+              // kolom mungkin sudah ada — aman diabaikan
+            }
+          }
+        }
       },
     );
   }

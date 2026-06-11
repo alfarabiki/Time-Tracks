@@ -10,6 +10,10 @@ class PhotoRecord {
   final String verificationCode;
   final String customText;
   final String imageHash; // SHA256 untuk integritas (anti-ubah)
+  final String staffName;
+  final String facility;
+  final String visitType;
+  final String trackingNumber;
 
   const PhotoRecord({
     required this.id,
@@ -22,6 +26,10 @@ class PhotoRecord {
     required this.verificationCode,
     required this.customText,
     required this.imageHash,
+    this.staffName = '',
+    this.facility = '',
+    this.visitType = '',
+    this.trackingNumber = '',
   });
 
   Map<String, Object?> toMap() {
@@ -36,6 +44,10 @@ class PhotoRecord {
       'verification_code': verificationCode,
       'custom_text': customText,
       'image_hash': imageHash,
+      'staff_name': staffName,
+      'facility': facility,
+      'visit_type': visitType,
+      'tracking_number': trackingNumber,
     };
   }
 
@@ -53,6 +65,10 @@ class PhotoRecord {
       verificationCode: (map['verification_code'] ?? '') as String,
       customText: (map['custom_text'] ?? '') as String,
       imageHash: (map['image_hash'] ?? '') as String,
+      staffName: (map['staff_name'] ?? '') as String,
+      facility: (map['facility'] ?? '') as String,
+      visitType: (map['visit_type'] ?? '') as String,
+      trackingNumber: (map['tracking_number'] ?? '') as String,
     );
   }
 }
