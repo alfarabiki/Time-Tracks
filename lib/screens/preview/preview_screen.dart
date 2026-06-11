@@ -9,6 +9,7 @@ import '../../models/overlay_settings.dart';
 import '../../services/draft_service.dart';
 import '../../services/photo_save_service.dart';
 import '../../services/settings_service.dart';
+import '../../services/tracking_service.dart';
 import '../../utils/app_theme.dart';
 import '../../utils/format_utils.dart';
 import '../../widgets/timemark_overlay.dart';
@@ -40,7 +41,18 @@ class _PreviewScreenState extends State<PreviewScreen> {
     super.initState();
     _data = widget.data;
     _settings = SettingsService.instance.current;
+    if (_data.visitType.isEmpty) {
+      _data = _data.copyWith(visitType: 'Sales Visit');
+    }
     _decode();
+    _assignTracking();
+  }
+
+  Future<void> _assignTracking() async {
+    if (_data.trackingNumber.isNotEmpty) return; // draft sudah punya nomor
+    final tn = await TrackingService.instance.next(_data.timestamp.year);
+    if (!mounted) return;
+    setState(() => _data = _data.copyWith(trackingNumber: tn));
   }
 
   Future<void> _decode() async {
@@ -137,6 +149,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
     final customCtrl = TextEditingController(text: _settings.customText);
     final latCtrl = TextEditingController(text: _data.latitude.toString());
     final lngCtrl = TextEditingController(text: _data.longitude.toString());
+    final staffCtrl = TextEditingController(text: _settings.staffName);
+    final facilityCtrl = TextEditingController(text: _data.facility);
 
     showModalBottomSheet<void>(
       context: context,
@@ -263,6 +277,56 @@ class _PreviewScreenState extends State<PreviewScreen> {
                               customText: v, showCustomText: true)),
                     ),
                     const SizedBox(height: 20),
+                    const Text('Data Kunjungan',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 16),
+
+                    // Nama Staf / Marketing
+                    _label('Nama Staf / Marketing'),
+                    TextField(
+                      controller: staffCtrl,
+                      decoration: _dec('mis. Budi Santoso'),
+                      onChanged: (v) => setState(
+                          () => _settings = _settings.copyWith(staffName: v)),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Faskes / Tujuan
+                    _label('Faskes / Tujuan'),
+                    TextField(
+                      controller: facilityCtrl,
+                      decoration: _dec('mis. RS Mitra Keluarga'),
+                      onChanged: (v) =>
+                          setState(() => _data = _data.copyWith(facility: v)),
+                    ),
+                    const SizedBox(height: 14),
+
+                    // Jenis Kunjungan
+                    _label('Jenis Kunjungan'),
+                    DropdownButtonFormField<String>(
+                      initialValue: _data.visitType.isEmpty
+                          ? 'Sales Visit'
+                          : _data.visitType,
+                      decoration: _dec(''),
+                      items: const [
+                        'Sales Visit',
+                        'Maintenance',
+                        'Audit Internal',
+                        'Follow-up',
+                        'Survey',
+                        'Lainnya',
+                      ]
+                          .map((e) =>
+                              DropdownMenuItem(value: e, child: Text(e)))
+                          .toList(),
+                      onChanged: (v) {
+                        if (v == null) return;
+                        setState(() => _data = _data.copyWith(visitType: v));
+                        setSheet(() {});
+                      },
+                    ),
+                    const SizedBox(height: 14),
 
                     SizedBox(
                       width: double.infinity,
