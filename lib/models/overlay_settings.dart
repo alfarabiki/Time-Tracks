@@ -91,11 +91,20 @@ class OverlaySettings {
   /// Gaya watermark kanan-atas.
   final WatermarkStyle watermarkStyle;
 
+  /// Nama staf/marketing (profil) — muncul otomatis di overlay.
+  final String staffName;
+
+  /// Tampilkan header Radjak di atas foto.
+  final bool showHeader;
+
+  /// Tampilkan baris info kunjungan (staf · jenis · faskes).
+  final bool showVisitInfo;
+
   const OverlaySettings({
     this.showTime = true,
     this.showAddress = true,
     this.showCoordinate = true,
-    this.showVerification = true,
+    this.showVerification = false,
     this.showCustomText = true,
     this.template = OverlayTemplate.a,
     this.customText = '',
@@ -110,6 +119,9 @@ class OverlaySettings {
     this.showWatermark = true,
     this.brandSize = FontSizeOption.medium,
     this.watermarkStyle = WatermarkStyle.kamera,
+    this.staffName = '',
+    this.showHeader = true,
+    this.showVisitInfo = true,
   });
 
   OverlaySettings copyWith({
@@ -131,6 +143,9 @@ class OverlaySettings {
     bool? showWatermark,
     FontSizeOption? brandSize,
     WatermarkStyle? watermarkStyle,
+    String? staffName,
+    bool? showHeader,
+    bool? showVisitInfo,
   }) {
     return OverlaySettings(
       showTime: showTime ?? this.showTime,
@@ -151,6 +166,9 @@ class OverlaySettings {
       showWatermark: showWatermark ?? this.showWatermark,
       brandSize: brandSize ?? this.brandSize,
       watermarkStyle: watermarkStyle ?? this.watermarkStyle,
+      staffName: staffName ?? this.staffName,
+      showHeader: showHeader ?? this.showHeader,
+      showVisitInfo: showVisitInfo ?? this.showVisitInfo,
     );
   }
 
@@ -173,6 +191,9 @@ class OverlaySettings {
         'showWatermark': showWatermark,
         'brandSize': brandSize.name,
         'watermarkStyle': watermarkStyle.name,
+        'staffName': staffName,
+        'showHeader': showHeader,
+        'showVisitInfo': showVisitInfo,
       };
 
   factory OverlaySettings.fromJson(Map<String, Object?> j) {
@@ -180,7 +201,7 @@ class OverlaySettings {
       showTime: (j['showTime'] ?? true) as bool,
       showAddress: (j['showAddress'] ?? true) as bool,
       showCoordinate: (j['showCoordinate'] ?? true) as bool,
-      showVerification: (j['showVerification'] ?? true) as bool,
+      showVerification: (j['showVerification'] ?? false) as bool,
       showCustomText: (j['showCustomText'] ?? true) as bool,
       template: OverlayTemplate.values.firstWhere(
         (t) => t.name == j['template'],
@@ -215,6 +236,9 @@ class OverlaySettings {
         (w) => w.name == j['watermarkStyle'],
         orElse: () => WatermarkStyle.kamera,
       ),
+      staffName: (j['staffName'] ?? '') as String,
+      showHeader: (j['showHeader'] ?? true) as bool,
+      showVisitInfo: (j['showVisitInfo'] ?? true) as bool,
     );
   }
 
