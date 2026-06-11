@@ -51,6 +51,13 @@ class TimemarkOverlay extends StatelessWidget {
 
         return Stack(
           children: [
+            // ===== TOP: Radjak header band (logo + nama RS) =====
+            if (settings.showHeader)
+              Align(
+                alignment: Alignment.topCenter,
+                child: _radjakHeader(),
+              ),
+
             // ===== TOP-RIGHT: Watermark (brand + sub-label) =====
             // Ukuran independen (brandSize) & bisa dimatikan ("Remove Watermark").
             if (settings.showWatermark)
@@ -198,6 +205,39 @@ class TimemarkOverlay extends StatelessWidget {
     );
   }
 
+  /// Header band di tepi atas foto: logo Radjak + nama RS, dengan garis emas
+  /// di bawahnya. Latar putih agar logo multi-warna tetap terbaca.
+  Widget _radjakHeader() {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        color: Color(0xEBFFFFFF), // putih ~92%
+        border: Border(bottom: BorderSide(color: Color(0xFFD4AF37), width: 2)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset('assets/branding/radjak_logo.webp', height: 22),
+          const SizedBox(width: 8),
+          const Flexible(
+            child: Text(
+              'RADJAK HOSPITAL · Salemba',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: Color(0xFF1E40AF),
+                fontWeight: FontWeight.w800,
+                fontSize: 12,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Brand watermark kanan-atas. Bila gaya dwiwarna, bagian "mark" diberi aksen.
   Widget _brand(double Function(double) s, List<Shadow> shadows) {
     final scale = settings.brandSize.scale;
@@ -286,6 +326,34 @@ class TimemarkOverlay extends StatelessWidget {
       lines.add(Text(
         FormatUtils.coordinates(data.latitude, data.longitude),
         style: style(0.036, weight: FontWeight.w500),
+      ));
+    }
+
+    // Info kunjungan: nama staff · jenis kunjungan · fasilitas
+    if (settings.showVisitInfo &&
+        (settings.staffName.isNotEmpty ||
+            data.visitType.isNotEmpty ||
+            data.facility.isNotEmpty)) {
+      if (lines.isNotEmpty) gap();
+      lines.add(Text(
+        [
+          if (settings.staffName.isNotEmpty) settings.staffName,
+          if (data.visitType.isNotEmpty) data.visitType,
+          if (data.facility.isNotEmpty) data.facility,
+        ].join('  ·  '),
+        style: style(0.032, weight: FontWeight.w600),
+      ));
+    }
+
+    // Nomor tracking kunjungan (aksen emas)
+    if (data.trackingNumber.isNotEmpty) {
+      if (lines.isNotEmpty) gap();
+      lines.add(Text(
+        data.trackingNumber,
+        style: style(0.032, weight: FontWeight.w700).copyWith(
+          color: const Color(0xFFD4AF37),
+          letterSpacing: 0.5,
+        ),
       ));
     }
 
