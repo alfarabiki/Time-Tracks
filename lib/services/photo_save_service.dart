@@ -103,6 +103,10 @@ class PhotoSaveService {
         verificationCode: data.verificationCode,
         customText: settings.showCustomText ? settings.customText : '',
         imageHash: hash,
+        staffName: settings.staffName,
+        facility: data.facility,
+        visitType: data.visitType,
+        trackingNumber: data.trackingNumber,
       );
       await DatabaseService.instance.insert(record);
       await LogService.instance.log('Image Saved', detail: outPath);
