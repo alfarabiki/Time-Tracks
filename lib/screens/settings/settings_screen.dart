@@ -18,6 +18,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   late final TextEditingController _employee;
   late final TextEditingController _brand;
   late final TextEditingController _verified;
+  late final TextEditingController _staffName;
 
   @override
   void initState() {
@@ -27,6 +28,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _employee = TextEditingController(text: _s.employeeName);
     _brand = TextEditingController(text: _s.brandName);
     _verified = TextEditingController(text: _s.verifiedLabel);
+    _staffName = TextEditingController(text: _s.staffName);
   }
 
   @override
@@ -35,6 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _employee.dispose();
     _brand.dispose();
     _verified.dispose();
+    _staffName.dispose();
     super.dispose();
   }
 
@@ -50,6 +53,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          _section('Profil Marketing'),
+          _textField(
+            _staffName,
+            hint: 'Nama Staf / Marketing',
+            onChanged: (v) => _update(_s.copyWith(staffName: v)),
+          ),
+          const SizedBox(height: 16),
+
           _section('Template'),
           _templateSelector(),
           const SizedBox(height: 8),
@@ -65,6 +76,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               (v) => _update(_s.copyWith(showVerification: v))),
           _switchTile('Custom Text', _s.showCustomText,
               (v) => _update(_s.copyWith(showCustomText: v))),
+          _switchTile('Header Radjak (atas foto)', _s.showHeader,
+              (v) => _update(_s.copyWith(showHeader: v))),
+          _switchTile('Info Kunjungan (staf · jenis · faskes)',
+              _s.showVisitInfo,
+              (v) => _update(_s.copyWith(showVisitInfo: v))),
 
           const SizedBox(height: 16),
           _section('Custom Text'),
