@@ -30,7 +30,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.timeproof.app"
+        // App TERPISAH dari TimeProof (com.timeproof.app) — terpasang berdampingan, tidak menimpa.
+        applicationId = "com.radjak.marketing"
         // Android 8 (API 26) s/d Android 15+
         minSdk = 26
         targetSdk = 35

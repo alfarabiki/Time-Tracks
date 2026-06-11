@@ -16,9 +16,9 @@ import 'log_service.dart';
 /// - control.json (kill switch / minimal versi) di GitHub raw.
 /// - releases/latest (deteksi versi baru + URL APK) via GitHub API.
 const String _kControlUrl =
-    'https://raw.githubusercontent.com/alfarabiki/Time-Tracks/main/control.json';
+    'https://raw.githubusercontent.com/alfarabiki/Radjak-Marketing/main/control.json';
 const String _kLatestApi =
-    'https://api.github.com/repos/alfarabiki/Time-Tracks/releases/latest';
+    'https://api.github.com/repos/alfarabiki/Radjak-Marketing/releases/latest';
 
 enum UpdateAction { none, optional, forced, killed }
 
