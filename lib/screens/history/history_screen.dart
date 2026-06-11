@@ -128,7 +128,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      r.verificationCode,
+                      r.trackingNumber.isNotEmpty
+                          ? r.trackingNumber
+                          : r.verificationCode,
                       style: const TextStyle(
                         color: AppTheme.accent,
                         fontSize: 12,

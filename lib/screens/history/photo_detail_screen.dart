@@ -49,6 +49,17 @@ class PhotoDetailScreen extends StatelessWidget {
               children: [
                 _row(Icons.schedule, 'Waktu',
                     FormatUtils.fullDate(record.timestamp)),
+                if (record.trackingNumber.isNotEmpty)
+                  _row(Icons.confirmation_number_outlined, 'Nomor Tracking',
+                      record.trackingNumber),
+                if (record.staffName.isNotEmpty)
+                  _row(Icons.badge_outlined, 'Nama Staf', record.staffName),
+                if (record.facility.isNotEmpty)
+                  _row(Icons.local_hospital_outlined, 'Faskes / Tujuan',
+                      record.facility),
+                if (record.visitType.isNotEmpty)
+                  _row(Icons.assignment_outlined, 'Jenis Kunjungan',
+                      record.visitType),
                 if (record.address.isNotEmpty)
                   _row(Icons.location_on_outlined, 'Alamat', record.address),
                 _row(Icons.my_location, 'Koordinat',
