@@ -100,7 +100,10 @@ void main() {
                   Container(color: const Color(0xFFBFA38C)),
                   TimemarkOverlay(
                     data: sampleCapture(),
-                    settings: const OverlaySettings(),
+                    // showVerification kini default false (MVP Radjak pakai
+                    // nomor tracking); aktifkan eksplisit agar tes "semua
+                    // elemen template" tetap memverifikasi kode verifikasi.
+                    settings: const OverlaySettings(showVerification: true),
                   ),
                 ],
               ),
