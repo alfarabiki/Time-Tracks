@@ -166,7 +166,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
                         height: 4,
                         margin: const EdgeInsets.only(bottom: 14),
                         decoration: BoxDecoration(
-                          color: Colors.white24,
+                          color: Colors.black12,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
@@ -286,8 +286,8 @@ class _PreviewScreenState extends State<PreviewScreen> {
   Widget _label(String t) => Padding(
         padding: const EdgeInsets.only(bottom: 6),
         child: Text(t,
-            style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
+            style: const TextStyle(
+                color: AppTheme.textSecondary,
                 fontSize: 12,
                 fontWeight: FontWeight.w600)),
       );
@@ -296,7 +296,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
         hintText: hint,
         isDense: true,
         filled: true,
-        fillColor: AppTheme.bg,
+        fillColor: AppTheme.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,

@@ -129,7 +129,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           const SizedBox(height: 24),
           ListTile(
-            leading: const Icon(Icons.article_outlined, color: Colors.white70),
+            leading: const Icon(Icons.article_outlined, color: AppTheme.textSecondary),
             title: const Text('Lihat Log Internal'),
             subtitle: const Text('Riwayat aktivitas 30 hari (troubleshooting)'),
             onTap: _showLogs,
@@ -254,7 +254,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             style: TextStyle(
               fontFamily: f,
               fontSize: 16,
-              color: selected ? Colors.black : Colors.white,
+              color: selected ? Colors.black : AppTheme.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -282,7 +282,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return TextField(
       controller: c,
       onChanged: onChanged,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: AppTheme.textPrimary),
       decoration: InputDecoration(
         hintText: hint,
         filled: true,

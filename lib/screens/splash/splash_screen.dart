@@ -43,9 +43,9 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            Text(
+            const Text(
               'Bukti foto terverifikasi',
-              style: TextStyle(color: Colors.white.withOpacity(0.6)),
+              style: TextStyle(color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 32),
             const SizedBox(

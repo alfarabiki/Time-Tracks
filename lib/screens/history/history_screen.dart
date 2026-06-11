@@ -64,10 +64,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.photo_outlined, size: 72, color: Colors.white24),
+          const Icon(Icons.photo_outlined, size: 72, color: AppTheme.textSecondary),
           const SizedBox(height: 14),
-          Text('Belum ada foto',
-              style: TextStyle(color: Colors.white.withOpacity(0.7))),
+          const Text('Belum ada foto',
+              style: TextStyle(color: AppTheme.textSecondary)),
         ],
       ),
     );
@@ -113,7 +113,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     Text(
                       FormatUtils.shortDate(r.timestamp),
                       style: const TextStyle(
-                          fontWeight: FontWeight.w600, color: Colors.white),
+                          fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -122,8 +122,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           : FormatUtils.coordinates(r.latitude, r.longitude),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: Colors.white.withOpacity(0.6),
+                      style: const TextStyle(
+                          color: AppTheme.textSecondary,
                           fontSize: 12),
                     ),
                     const SizedBox(height: 4),
@@ -139,7 +139,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Colors.white38),
+              const Icon(Icons.chevron_right, color: AppTheme.textSecondary),
             ],
           ),
         ),

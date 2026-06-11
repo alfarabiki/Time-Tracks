@@ -104,13 +104,13 @@ class PhotoDetailScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style: TextStyle(
-                        color: Colors.white.withOpacity(0.55),
+                    style: const TextStyle(
+                        color: AppTheme.textSecondary,
                         fontSize: 12)),
                 const SizedBox(height: 2),
                 SelectableText(
                   value,
-                  style: const TextStyle(color: Colors.white, height: 1.35),
+                  style: const TextStyle(color: AppTheme.textPrimary, height: 1.35),
                 ),
               ],
             ),

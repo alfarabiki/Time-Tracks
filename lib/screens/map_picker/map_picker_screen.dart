@@ -260,7 +260,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                             zoom: 16);
                       }
                     },
-                    child: const Icon(Icons.my_location, color: Colors.white),
+                    child: const Icon(Icons.my_location, color: AppTheme.primary),
                   ),
                 ),
                 Positioned(
@@ -285,11 +285,11 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
             controller: _searchCtrl,
             textInputAction: TextInputAction.search,
             onSubmitted: (_) => _runSearch(),
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: AppTheme.textPrimary),
             decoration: InputDecoration(
               hintText: 'Cari alamat atau tempat...',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-              prefixIcon: const Icon(Icons.search, color: Colors.white70),
+              hintStyle: const TextStyle(color: AppTheme.textSecondary),
+              prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary),
               suffixIcon: _searching
                   ? const Padding(
                       padding: EdgeInsets.all(12),
@@ -327,7 +327,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
               padding: EdgeInsets.zero,
               itemCount: _results.length,
               separatorBuilder: (_, __) =>
-                  Divider(height: 1, color: Colors.white.withOpacity(0.08)),
+                  const Divider(height: 1, color: Colors.black12),
               itemBuilder: (ctx, i) {
                 final r = _results[i];
                 return ListTile(
@@ -338,7 +338,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                     r.name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 13, color: Colors.white),
+                    style: const TextStyle(fontSize: 13, color: AppTheme.textPrimary),
                   ),
                   onTap: () => _goTo(LatLng(r.lat, r.lng)),
                 );
