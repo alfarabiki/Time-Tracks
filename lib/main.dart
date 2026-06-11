@@ -40,7 +40,8 @@ class TimeProofApp extends StatelessWidget {
     return MaterialApp(
       title: K.appName,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.dark,
+      theme: AppTheme.light,
+      themeMode: ThemeMode.light,
       home: const SplashScreen(),
     );
   }
