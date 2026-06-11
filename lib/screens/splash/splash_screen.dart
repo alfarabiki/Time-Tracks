@@ -33,18 +33,23 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(28),
-              child: Image.asset(
-                'assets/icon/logo.png',
-                width: 140,
-                height: 140,
-                fit: BoxFit.cover,
-              ),
+            Image.asset(
+              'assets/branding/radjak_logo.webp',
+              width: 200,
+              fit: BoxFit.contain,
             ),
             const SizedBox(height: 20),
             const Text(
-              'Bukti foto terverifikasi',
+              'Radjak Marketing',
+              style: TextStyle(
+                color: AppTheme.textPrimary,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              'Bukti Kunjungan Marketing',
               style: TextStyle(color: AppTheme.textSecondary),
             ),
             const SizedBox(height: 32),
