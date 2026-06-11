@@ -11,6 +11,9 @@ class CaptureData {
   final int timestampMs;
   final String verificationCode;
   final bool locationAvailable;
+  final String facility;
+  final String visitType;
+  final String trackingNumber;
 
   const CaptureData({
     required this.rawImagePath,
@@ -21,6 +24,9 @@ class CaptureData {
     required this.timestampMs,
     required this.verificationCode,
     required this.locationAvailable,
+    this.facility = '',
+    this.visitType = '',
+    this.trackingNumber = '',
   });
 
   DateTime get timestamp => DateTime.fromMillisecondsSinceEpoch(timestampMs);
@@ -32,6 +38,9 @@ class CaptureData {
     String? address,
     int? timestampMs,
     bool? locationAvailable,
+    String? facility,
+    String? visitType,
+    String? trackingNumber,
   }) {
     return CaptureData(
       rawImagePath: rawImagePath,
@@ -42,6 +51,9 @@ class CaptureData {
       timestampMs: timestampMs ?? this.timestampMs,
       verificationCode: verificationCode,
       locationAvailable: locationAvailable ?? this.locationAvailable,
+      facility: facility ?? this.facility,
+      visitType: visitType ?? this.visitType,
+      trackingNumber: trackingNumber ?? this.trackingNumber,
     );
   }
 
@@ -54,6 +66,9 @@ class CaptureData {
         'timestampMs': timestampMs,
         'verificationCode': verificationCode,
         'locationAvailable': locationAvailable,
+        'facility': facility,
+        'visitType': visitType,
+        'trackingNumber': trackingNumber,
       };
 
   factory CaptureData.fromJson(Map<String, Object?> j) => CaptureData(
@@ -65,6 +80,9 @@ class CaptureData {
         timestampMs: ((j['timestampMs'] ?? 0) as num).toInt(),
         verificationCode: (j['verificationCode'] ?? '') as String,
         locationAvailable: (j['locationAvailable'] ?? false) as bool,
+        facility: (j['facility'] ?? '') as String,
+        visitType: (j['visitType'] ?? '') as String,
+        trackingNumber: (j['trackingNumber'] ?? '') as String,
       );
 
   String encode() => jsonEncode(toJson());
