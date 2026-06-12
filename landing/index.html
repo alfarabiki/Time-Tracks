@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>TimeProof — Bukti Foto Terverifikasi</title>
+<title>TimeProof & Radjak Marketing — Bukti Foto Terverifikasi</title>
 <meta name="description" content="Aplikasi Android dokumentasi kehadiran & aktivitas kerja dengan bukti foto: timestamp, alamat, koordinat GPS, dan kode verifikasi. Berjalan offline." />
 <meta property="og:title" content="TimeProof — Bukti Foto Terverifikasi" />
 <meta property="og:description" content="Foto kerja dengan timestamp, alamat, koordinat GPS & kode verifikasi. Offline, Android 8–15." />
@@ -84,6 +84,12 @@
   .dl h2{font-size:30px}
   .dl p{color:var(--muted);max-width:520px;margin:10px auto 28px}
   .note{font-size:12.5px;color:var(--muted);margin-top:16px}
+  .dlgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:8px;text-align:left}
+  @media(max-width:640px){.dlgrid{grid-template-columns:1fr}}
+  .dlcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:10px}
+  .dlcard h3{font-size:18px}
+  .dlcard p{font-size:13.5px;color:var(--muted);flex:1}
+  .dlcard .btn{margin-top:4px;justify-content:center}
 
   footer{padding:40px 0;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px}
   footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
@@ -177,14 +183,29 @@
 <section id="unduh">
   <div class="wrap">
     <div class="dl">
-      <h2>Unduh TimeProof</h2>
-      <p>Pasang APK di perangkat Android 8 ke atas. Izinkan "Instal dari sumber tidak dikenal" jika diminta.</p>
-      <a href="https://github.com/alfarabiki/Time-Tracks/releases/latest/download/TimeProof-arm64-v8a.apk" class="btn" id="apk-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10182a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
-        Unduh APK (arm64)
-      </a>
-      <p class="note">HP lama / arsitektur lain? <a class="accent" href="https://github.com/alfarabiki/Time-Tracks/releases/latest" target="_blank" rel="noopener">lihat semua versi APK</a></p>
-      <p class="note">Kode sumber lengkap tersedia di <a class="accent" href="https://github.com/alfarabiki/Time-Tracks" target="_blank" rel="noopener">github.com/alfarabiki/Time-Track</a></p>
+      <h2>Dua aplikasi, satu sumber</h2>
+      <p>Pilih aplikasi sesuai kebutuhan. Keduanya offline (Android 8+) dan <b>terpasang berdampingan</b> — tidak saling menimpa. Izinkan "Instal dari sumber tidak dikenal" jika diminta.</p>
+      <div class="dlgrid">
+        <div class="dlcard">
+          <h3>TimeProof</h3>
+          <p>Bukti foto kerja umum: waktu, alamat, koordinat GPS & kode verifikasi.</p>
+          <a href="https://github.com/alfarabiki/Time-Tracks/releases/latest/download/TimeProof-arm64-v8a.apk" class="btn" id="apk-link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10182a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+            Unduh TimeProof (arm64)
+          </a>
+          <p class="note">HP lama / arsitektur lain? <a class="accent" href="https://github.com/alfarabiki/Time-Tracks/releases/latest" target="_blank" rel="noopener">semua versi APK</a></p>
+        </div>
+        <div class="dlcard">
+          <h3>Radjak Marketing</h3>
+          <p>Bukti kunjungan marketing RS Radjak: logo Radjak di foto, data kunjungan & nomor tracking.</p>
+          <a href="https://github.com/alfarabiki/Radjak-Marketing/releases/latest/download/RadjakMarketing-arm64-v8a.apk" class="btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10182a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>
+            Unduh Radjak (arm64)
+          </a>
+          <p class="note">HP lama / arsitektur lain? <a class="accent" href="https://github.com/alfarabiki/Radjak-Marketing/releases/latest" target="_blank" rel="noopener">semua versi APK</a></p>
+        </div>
+      </div>
+      <p class="note">Kode sumber: <a class="accent" href="https://github.com/alfarabiki/Time-Tracks" target="_blank" rel="noopener">Time-Tracks</a> — TimeProof di <code>main</code>, Radjak di branch <code>radjak-app</code>.</p>
     </div>
   </div>
 </section>
