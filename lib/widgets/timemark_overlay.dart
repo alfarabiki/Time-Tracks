@@ -54,7 +54,7 @@ class TimemarkOverlay extends StatelessWidget {
             // ===== TOP: Radjak header band (logo + nama RS) =====
             if (settings.showHeader)
               Align(
-                alignment: Alignment.topCenter,
+                alignment: Alignment.topLeft,
                 child: _radjakHeader(),
               ),
 
@@ -134,11 +134,11 @@ class TimemarkOverlay extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        // Amber accent bar
+                        // Blue accent bar
                         Container(
                           width: s(0.009),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF5A623),
+                            color: const Color(0xFF4F9DF7),
                             borderRadius: BorderRadius.circular(s(0.006)),
                           ),
                         ),
@@ -205,36 +205,12 @@ class TimemarkOverlay extends StatelessWidget {
     );
   }
 
-  /// Header band di tepi atas foto: logo Radjak + nama RS, dengan garis emas
-  /// di bawahnya. Latar putih agar logo multi-warna tetap terbaca.
+  /// Header di tepi atas foto: hanya logo Radjak transparan, tanpa band putih
+  /// dan tanpa teks nama RS.
   Widget _radjakHeader() {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xEBFFFFFF), // putih ~92%
-        border: Border(bottom: BorderSide(color: Color(0xFFD4AF37), width: 2)),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Image.asset('assets/branding/radjak_logo.webp', height: 22),
-          const SizedBox(width: 8),
-          const Flexible(
-            child: Text(
-              'RADJAK HOSPITAL · Salemba',
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                color: Color(0xFF1E40AF),
-                fontWeight: FontWeight.w800,
-                fontSize: 12,
-                letterSpacing: 0.3,
-              ),
-            ),
-          ),
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 14, left: 14),
+      child: Image.asset('assets/branding/radjak_logo.png', height: 34),
     );
   }
 

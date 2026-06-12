@@ -114,7 +114,7 @@ class OverlaySettings {
     this.verifiedLabel = 'Radjak Verified',
     this.imageQuality = ImageQuality.medium,
     this.fontSize = FontSizeOption.medium,
-    this.fontFamily = 'Roboto',
+    this.fontFamily = 'Inter',
     this.verifiedSize = FontSizeOption.medium,
     this.showWatermark = true,
     this.brandSize = FontSizeOption.medium,
@@ -222,7 +222,7 @@ class OverlaySettings {
       ),
       fontFamily: kOverlayFonts.contains(j['fontFamily'])
           ? j['fontFamily'] as String
-          : 'Roboto',
+          : 'Inter',
       verifiedSize: FontSizeOption.values.firstWhere(
         (f) => f.name == j['verifiedSize'],
         orElse: () => FontSizeOption.medium,
