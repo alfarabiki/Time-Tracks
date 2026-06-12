@@ -11,7 +11,6 @@ import '../../services/photo_save_service.dart';
 import '../../services/settings_service.dart';
 import '../../services/tracking_service.dart';
 import '../../utils/app_theme.dart';
-import '../../utils/format_utils.dart';
 import '../../widgets/timemark_overlay.dart';
 
 class PreviewScreen extends StatefulWidget {
@@ -116,257 +115,6 @@ class _PreviewScreenState extends State<PreviewScreen> {
     if (mounted) Navigator.of(context).pop(false);
   }
 
-  // ===== Edit handlers =====
-
-  Future<void> _editDateTime() async {
-    final now = _data.timestamp;
-    final date = await showDatePicker(
-      context: context,
-      initialDate: now,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (date == null || !mounted) return;
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(now),
-    );
-    if (!mounted) return;
-    final dt = DateTime(
-      date.year,
-      date.month,
-      date.day,
-      time?.hour ?? now.hour,
-      time?.minute ?? now.minute,
-    );
-    setState(() {
-      _data = _data.copyWith(timestampMs: dt.millisecondsSinceEpoch);
-    });
-  }
-
-  void _openEditor() {
-    final addressCtrl = TextEditingController(text: _data.address);
-    final customCtrl = TextEditingController(text: _settings.customText);
-    final latCtrl = TextEditingController(text: _data.latitude.toString());
-    final lngCtrl = TextEditingController(text: _data.longitude.toString());
-    final staffCtrl = TextEditingController(text: _settings.staffName);
-    final facilityCtrl = TextEditingController(text: _data.facility);
-
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppTheme.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setSheet) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 18,
-                right: 18,
-                top: 16,
-                bottom: MediaQuery.of(ctx).viewInsets.bottom + 18,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: Container(
-                        width: 40,
-                        height: 4,
-                        margin: const EdgeInsets.only(bottom: 14),
-                        decoration: BoxDecoration(
-                          color: Colors.black12,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                    const Text('Ubah Data Overlay',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w700)),
-                    const SizedBox(height: 16),
-
-                    // Tanggal & waktu
-                    ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: const Icon(Icons.schedule, color: AppTheme.accent),
-                      title: const Text('Tanggal & Waktu'),
-                      subtitle: Text(FormatUtils.fullDate(_data.timestamp)),
-                      trailing: const Icon(Icons.edit, size: 18),
-                      onTap: () async {
-                        await _editDateTime();
-                        setSheet(() {});
-                      },
-                    ),
-                    const Divider(height: 1),
-                    const SizedBox(height: 14),
-
-                    // Alamat
-                    _label('Alamat'),
-                    TextField(
-                      controller: addressCtrl,
-                      maxLines: 3,
-                      minLines: 2,
-                      decoration: _dec('Alamat lokasi'),
-                      onChanged: (v) => setState(
-                          () => _data = _data.copyWith(address: v)),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Koordinat
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _label('Latitude'),
-                              TextField(
-                                controller: latCtrl,
-                                keyboardType: const TextInputType
-                                    .numberWithOptions(decimal: true, signed: true),
-                                decoration: _dec('-6.185037'),
-                                onChanged: (v) {
-                                  final d = double.tryParse(v);
-                                  if (d != null) {
-                                    setState(() => _data =
-                                        _data.copyWith(latitude: d, locationAvailable: true));
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _label('Longitude'),
-                              TextField(
-                                controller: lngCtrl,
-                                keyboardType: const TextInputType
-                                    .numberWithOptions(decimal: true, signed: true),
-                                decoration: _dec('106.863431'),
-                                onChanged: (v) {
-                                  final d = double.tryParse(v);
-                                  if (d != null) {
-                                    setState(() => _data =
-                                        _data.copyWith(longitude: d, locationAvailable: true));
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Custom text
-                    _label('Custom Text'),
-                    TextField(
-                      controller: customCtrl,
-                      decoration: _dec('mis. Sales Visit / Audit Internal'),
-                      onChanged: (v) => setState(() => _settings =
-                          _settings.copyWith(
-                              customText: v, showCustomText: true)),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text('Data Kunjungan',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w700)),
-                    const SizedBox(height: 16),
-
-                    // Nama Staf / Marketing
-                    _label('Nama Staf / Marketing'),
-                    TextField(
-                      controller: staffCtrl,
-                      decoration: _dec('mis. Budi Santoso'),
-                      onChanged: (v) => setState(
-                          () => _settings = _settings.copyWith(staffName: v)),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Faskes / Tujuan
-                    _label('Faskes / Tujuan'),
-                    TextField(
-                      controller: facilityCtrl,
-                      decoration: _dec('mis. RS Mitra Keluarga'),
-                      onChanged: (v) =>
-                          setState(() => _data = _data.copyWith(facility: v)),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // Jenis Kunjungan
-                    _label('Jenis Kunjungan'),
-                    DropdownButtonFormField<String>(
-                      initialValue: _data.visitType.isEmpty
-                          ? 'Sales Visit'
-                          : _data.visitType,
-                      decoration: _dec(''),
-                      items: const [
-                        'Sales Visit',
-                        'Maintenance',
-                        'Audit Internal',
-                        'Follow-up',
-                        'Survey',
-                        'Lainnya',
-                      ]
-                          .map((e) =>
-                              DropdownMenuItem(value: e, child: Text(e)))
-                          .toList(),
-                      onChanged: (v) {
-                        if (v == null) return;
-                        setState(() => _data = _data.copyWith(visitType: v));
-                        setSheet(() {});
-                      },
-                    ),
-                    const SizedBox(height: 14),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () => Navigator.pop(ctx),
-                        icon: const Icon(Icons.check),
-                        label: const Text('Selesai'),
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Widget _label(String t) => Padding(
-        padding: const EdgeInsets.only(bottom: 6),
-        child: Text(t,
-            style: const TextStyle(
-                color: AppTheme.textSecondary,
-                fontSize: 12,
-                fontWeight: FontWeight.w600)),
-      );
-
-  InputDecoration _dec(String hint) => InputDecoration(
-        hintText: hint,
-        isDense: true,
-        filled: true,
-        fillColor: AppTheme.surface,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-      );
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -376,14 +124,6 @@ class _PreviewScreenState extends State<PreviewScreen> {
         appBar: AppBar(
           backgroundColor: Colors.black,
           title: const Text('Pratinjau'),
-          actions: [
-            TextButton.icon(
-              onPressed: _saving ? null : _openEditor,
-              icon: const Icon(Icons.edit, size: 18, color: AppTheme.accent),
-              label: const Text('Ubah Data',
-                  style: TextStyle(color: AppTheme.accent)),
-            ),
-          ],
         ),
         body: _loadingImage
             ? const Center(
@@ -442,9 +182,9 @@ class _PreviewScreenState extends State<PreviewScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.touch_app, size: 14, color: Colors.white38),
+              const Icon(Icons.lock_outline, size: 14, color: Colors.white38),
               const SizedBox(width: 6),
-              Text('Ketuk "Ubah Data" untuk edit tanggal, alamat, koordinat & teks',
+              Text('Foto terkunci — data tidak dapat diubah (anti-pemalsuan).',
                   style: TextStyle(
                       color: Colors.white.withOpacity(0.5), fontSize: 11)),
             ],
