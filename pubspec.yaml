@@ -91,6 +91,9 @@ flutter:
     - family: Inter
       fonts:
         - asset: assets/fonts/Inter.ttf
+    - family: Fraunces
+      fonts:
+        - asset: assets/fonts/Fraunces.ttf
     - family: Montserrat
       fonts:
         - asset: assets/fonts/Montserrat.ttf
