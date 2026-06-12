@@ -12,7 +12,8 @@ import '../start_visit/start_visit_screen.dart';
 import '../history/photo_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final VoidCallback? onSeeAll;
+  const HomeScreen({super.key, this.onSeeAll});
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -89,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
           PrimaryGradientButton(title: 'Mulai Kunjungan', subtitle: 'Foto bukti + lokasi otomatis',
             icon: Icons.camera_alt_outlined, onTap: _startVisit),
           const SizedBox(height: 24),
-          SectionHeader(title: 'Kunjungan Terakhir', actionLabel: _recent.isEmpty ? null : 'Lihat semua', onAction: () {}),
+          SectionHeader(title: 'Kunjungan Terakhir', actionLabel: _recent.isEmpty ? null : 'Lihat semua', onAction: widget.onSeeAll),
           const SizedBox(height: 12),
           if (_loading) const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
           else if (_recent.isEmpty) const Padding(padding: EdgeInsets.symmetric(vertical: 18),

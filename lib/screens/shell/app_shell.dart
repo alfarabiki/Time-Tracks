@@ -13,7 +13,11 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _i = 0;
-  late final List<Widget> _pages = const [HomeScreen(), HistoryScreen(), SettingsScreen()];
+  late final List<Widget> _pages = [
+    HomeScreen(onSeeAll: () => setState(() => _i = 1)),
+    const HistoryScreen(),
+    const SettingsScreen(),
+  ];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

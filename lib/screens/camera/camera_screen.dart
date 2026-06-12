@@ -1,6 +1,5 @@
 ﻿import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../models/capture_data.dart';
@@ -12,9 +11,7 @@ import '../../services/storage_service.dart';
 import '../../services/update_service.dart';
 import '../../services/verification_service.dart';
 import '../../utils/app_theme.dart';
-import '../history/history_screen.dart';
 import '../preview/preview_screen.dart';
-import '../settings/settings_screen.dart';
 
 class CameraScreen extends StatefulWidget {
   final String facility;
@@ -243,43 +240,6 @@ class _CameraScreenState extends State<CameraScreen>
     }
   }
 
-  Future<void> _importFromGallery() async {
-    if (_busy) return;
-    try {
-      final picker = ImagePicker();
-      final XFile? file = await picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 100,
-      );
-      if (file == null || !mounted) return;
-      setState(() => _busy = true);
-      await LogService.instance.log('Photo Imported');
-
-      final loc = await _resolveLocation();
-      if (!mounted) return;
-
-      final data = CaptureData(
-        rawImagePath: file.path,
-        latitude: loc.lat,
-        longitude: loc.lng,
-        accuracy: loc.acc,
-        address: loc.address,
-        timestampMs: DateTime.now().millisecondsSinceEpoch,
-        verificationCode: VerificationService.generate(),
-        locationAvailable: loc.available,
-      );
-      await DraftService.instance.save(data);
-      await _openPreview(data);
-    } catch (_) {
-      if (mounted) {
-        showAppMessage(context, 'Gagal membuka galeri. Silakan coba lagi.',
-            error: true);
-      }
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
   Future<void> _openPreview(CaptureData data) async {
     final saved = await Navigator.of(context).push<bool>(
       MaterialPageRoute(builder: (_) => PreviewScreen(data: data)),
@@ -314,28 +274,7 @@ class _CameraScreenState extends State<CameraScreen>
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
-        title: const Text('TimeProof'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add_photo_alternate_outlined),
-            tooltip: 'Import dari galeri',
-            onPressed: _busy ? null : _importFromGallery,
-          ),
-          IconButton(
-            icon: const Icon(Icons.photo_library_outlined),
-            tooltip: 'Riwayat',
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const HistoryScreen()),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            tooltip: 'Pengaturan',
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const SettingsScreen()),
-            ),
-          ),
-        ],
+        title: const Text('Kunjungan'),
       ),
       body: Column(
         children: [
@@ -462,49 +401,12 @@ class _CameraScreenState extends State<CameraScreen>
               ),
             ),
           ),
-          _circleButton(
-            icon: Icons.tune,
-            label: 'Template',
-            onTap: !_busy
-                ? () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                          builder: (_) => const SettingsScreen()),
-                    )
-                : null,
-          ),
+          const SizedBox(width: 54),
         ],
       ),
     );
   }
 
-  Widget _circleButton({
-    required IconData icon,
-    required String label,
-    VoidCallback? onTap,
-  }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        InkWell(
-          onTap: onTap,
-          customBorder: const CircleBorder(),
-          child: Container(
-            width: 54,
-            height: 54,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppTheme.surface,
-            ),
-            child: Icon(icon,
-                color: onTap == null ? Colors.white30 : Colors.white),
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(label,
-            style: const TextStyle(color: Colors.white70, fontSize: 12)),
-      ],
-    );
-  }
 }
 
 /// Hasil resolusi lokasi internal.
