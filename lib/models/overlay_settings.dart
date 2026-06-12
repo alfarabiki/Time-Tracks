@@ -41,8 +41,8 @@ const List<String> kOverlayFonts = ['Roboto', 'Inter', 'Montserrat', 'Oswald'];
 /// - [kamera]: brand putih + sub-label "Kamera".
 /// - [akurat]: brand dwiwarna ("mark" kuning) + sub-label "Foto 100% akurat".
 enum WatermarkStyle {
-  kamera('Kamera', false, 'Timemark Kamera'),
-  akurat('Foto 100% akurat', true, 'Foto 100% akurat');
+  kamera('Verified', false, 'Radjak (Verified)'),
+  akurat('Foto 100% akurat', true, 'Radjak (Foto 100% akurat)');
 
   /// Sub-label di bawah brand.
   final String sublabel;
@@ -109,9 +109,9 @@ class OverlaySettings {
     this.template = OverlayTemplate.a,
     this.customText = '',
     this.employeeName = '',
-    this.brandName = 'Timemark',
-    this.cameraLabel = 'Kamera',
-    this.verifiedLabel = 'Timemark Verified',
+    this.brandName = 'Radjak',
+    this.cameraLabel = 'Verified',
+    this.verifiedLabel = 'Radjak Verified',
     this.imageQuality = ImageQuality.medium,
     this.fontSize = FontSizeOption.medium,
     this.fontFamily = 'Roboto',
@@ -209,9 +209,9 @@ class OverlaySettings {
       ),
       customText: (j['customText'] ?? '') as String,
       employeeName: (j['employeeName'] ?? '') as String,
-      brandName: (j['brandName'] ?? 'Timemark') as String,
-      cameraLabel: (j['cameraLabel'] ?? 'Kamera') as String,
-      verifiedLabel: (j['verifiedLabel'] ?? 'Timemark Verified') as String,
+      brandName: (j['brandName'] ?? 'Radjak') as String,
+      cameraLabel: (j['cameraLabel'] ?? 'Verified') as String,
+      verifiedLabel: (j['verifiedLabel'] ?? 'Radjak Verified') as String,
       imageQuality: ImageQuality.values.firstWhere(
         (q) => q.name == j['imageQuality'],
         orElse: () => ImageQuality.medium,

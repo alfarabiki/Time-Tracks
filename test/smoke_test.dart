@@ -55,7 +55,7 @@ void main() {
       expect(back.customText, 'Sales Visit');
       expect(back.template, OverlayTemplate.b);
       expect(back.imageQuality, ImageQuality.high);
-      expect(back.brandName, 'Timemark');
+      expect(back.brandName, 'Radjak');
     });
 
     test('PhotoRecord toMap/fromMap', () {
@@ -113,9 +113,9 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      // Brand + sub
-      expect(find.text('Timemark'), findsOneWidget);
-      expect(find.text('Kamera'), findsOneWidget);
+      // Brand + sub (Radjak)
+      expect(find.text('Radjak'), findsOneWidget);
+      expect(find.text('Verified'), findsOneWidget);
       // Waktu
       expect(find.text('Selasa, 02 Juni 2026 22:21'), findsOneWidget);
       // Koordinat
