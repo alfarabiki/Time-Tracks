@@ -16,8 +16,9 @@ class PhotoDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final file = File(record.imagePath);
     return Scaffold(
+      backgroundColor: AppTheme.bg,
       appBar: AppBar(
-        title: const Text('Detail Foto'),
+        title: const Text('Detail Kunjungan'),
         actions: [
           IconButton(
             tooltip: 'Hapus',
@@ -27,23 +28,27 @@ class PhotoDetailScreen extends StatelessWidget {
         ],
       ),
       body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         children: [
-          AspectRatio(
-            aspectRatio: 3 / 4,
-            child: file.existsSync()
-                ? InteractiveViewer(
-                    child: Image.file(file, fit: BoxFit.contain),
-                  )
-                : Container(
-                    color: Colors.black26,
-                    child: const Center(
-                      child: Icon(Icons.broken_image,
-                          color: Colors.white38, size: 56),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: AspectRatio(
+              aspectRatio: 3 / 4,
+              child: file.existsSync()
+                  ? InteractiveViewer(
+                      child: Image.file(file, fit: BoxFit.cover),
+                    )
+                  : Container(
+                      color: AppTheme.surface,
+                      child: const Center(
+                        child: Icon(Icons.broken_image,
+                            color: AppTheme.textSecondary, size: 56),
+                      ),
                     ),
-                  ),
+            ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -73,10 +78,17 @@ class PhotoDetailScreen extends StatelessWidget {
                     record.verificationCode),
                 _row(Icons.fingerprint, 'SHA256 (integritas)',
                     record.imageHash.isEmpty ? '–' : record.imageHash),
-                const SizedBox(height: 18),
+                const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14)),
+                    ),
                     onPressed: () async {
                       final ok = await GalleryService.instance
                           .saveToGallery(record.imagePath);
@@ -103,12 +115,18 @@ class PhotoDetailScreen extends StatelessWidget {
   }
 
   Widget _row(IconData icon, String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppTheme.line),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 20, color: AppTheme.accent),
+          Icon(icon, size: 20, color: AppTheme.primary),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -117,11 +135,15 @@ class PhotoDetailScreen extends StatelessWidget {
                 Text(label,
                     style: const TextStyle(
                         color: AppTheme.textSecondary,
-                        fontSize: 12)),
-                const SizedBox(height: 2),
+                        fontSize: 12.5)),
+                const SizedBox(height: 3),
                 SelectableText(
                   value,
-                  style: const TextStyle(color: AppTheme.textPrimary, height: 1.35),
+                  style: const TextStyle(
+                      color: AppTheme.textPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      height: 1.35),
                 ),
               ],
             ),
