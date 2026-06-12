@@ -112,4 +112,48 @@ class DatabaseService {
       await LogService.instance.log('DB Delete Failed', detail: e.toString());
     }
   }
+
+  Future<int> countToday({DateTime? now}) async {
+    final n = now ?? DateTime.now();
+    final start = DateTime(n.year, n.month, n.day).millisecondsSinceEpoch;
+    final end = start + const Duration(days: 1).inMilliseconds;
+    return _countBetween(start, end);
+  }
+
+  Future<int> countThisMonth({DateTime? now}) async {
+    final n = now ?? DateTime.now();
+    final start = DateTime(n.year, n.month, 1).millisecondsSinceEpoch;
+    final end = DateTime(n.year, n.month + 1, 1).millisecondsSinceEpoch;
+    return _countBetween(start, end);
+  }
+
+  Future<int> _countBetween(int startMs, int endMs) async {
+    try {
+      final db = await _database;
+      final r = await db.rawQuery(
+        'SELECT COUNT(*) AS c FROM $_table WHERE timestamp >= ? AND timestamp < ?',
+        [startMs, endMs],
+      );
+      return (r.first['c'] as int?) ?? 0;
+    } catch (_) {
+      return 0;
+    }
+  }
+
+  Future<List<PhotoRecord>> recent(int n) async {
+    try {
+      final db = await _database;
+      final rows = await db.query(_table, orderBy: 'timestamp DESC', limit: n);
+      return rows.map(PhotoRecord.fromMap).toList();
+    } catch (_) {
+      return <PhotoRecord>[];
+    }
+  }
+
+  /// Khusus test: kosongkan tabel agar fresh.
+  Future<void> debugReset() async {
+    try {
+      await (await _database).delete(_table);
+    } catch (_) {}
+  }
 }

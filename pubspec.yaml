@@ -67,6 +67,7 @@ dev_dependencies:
   flutter_launcher_icons: ^0.14.1
   flutter_test:
     sdk: flutter
+  sqflite_common_ffi: ^2.4.2
 
 # Ikon aplikasi dari Logo.png
 flutter_launcher_icons:
