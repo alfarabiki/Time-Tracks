@@ -13,12 +13,20 @@ import '../../services/update_service.dart';
 import '../../services/verification_service.dart';
 import '../../utils/app_theme.dart';
 import '../history/history_screen.dart';
-import '../map_picker/map_picker_screen.dart';
 import '../preview/preview_screen.dart';
 import '../settings/settings_screen.dart';
 
 class CameraScreen extends StatefulWidget {
-  const CameraScreen({super.key});
+  final String facility;
+  final String visitType;
+  final String staffName;
+
+  const CameraScreen({
+    super.key,
+    this.facility = '',
+    this.visitType = '',
+    this.staffName = '',
+  });
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
@@ -33,8 +41,6 @@ class _CameraScreenState extends State<CameraScreen>
 
   List<CameraDescription> _cameras = const [];
   CameraDescription? _current;
-
-  MapPickResult? _manualLocation;
 
   @override
   void initState() {
@@ -205,7 +211,7 @@ class _CameraScreenState extends State<CameraScreen>
       final loc = await _resolveLocation();
       if (!mounted) return;
 
-      final data = CaptureData(
+      final baseData = CaptureData(
         rawImagePath: shot.path,
         latitude: loc.lat,
         longitude: loc.lng,
@@ -215,8 +221,12 @@ class _CameraScreenState extends State<CameraScreen>
         verificationCode: VerificationService.generate(),
         locationAvailable: loc.available,
       );
-      await DraftService.instance.save(data);
-      await _openPreview(data);
+      final withVisit = baseData.copyWith(
+        facility: widget.facility,
+        visitType: widget.visitType,
+      );
+      await DraftService.instance.save(withVisit);
+      await _openPreview(withVisit);
     } on CameraException catch (e) {
       await LogService.instance.log('Capture Failed', detail: e.code);
       if (mounted) {
@@ -275,19 +285,12 @@ class _CameraScreenState extends State<CameraScreen>
       MaterialPageRoute(builder: (_) => PreviewScreen(data: data)),
     );
     if (!mounted) return;
-    setState(() => _manualLocation = null);
     if (saved == true) {
       showAppMessage(context, 'Foto berhasil disimpan ke galeri.');
     }
   }
 
   Future<_Loc> _resolveLocation() async {
-    // Lokasi manual (dipilih dari peta) diprioritaskan.
-    final manual = _manualLocation;
-    if (manual != null) {
-      return _Loc(manual.lat, manual.lng, 0, manual.address, true);
-    }
-
     final res = await LocationService.instance.getCurrent();
     if (res.ok) {
       final pos = res.position!;
@@ -298,51 +301,11 @@ class _CameraScreenState extends State<CameraScreen>
       return _Loc(pos.latitude, pos.longitude, pos.accuracy, addr, true);
     }
 
-    // Gagal → tawarkan pilih manual atau lanjut tanpa lokasi (tanpa freeze).
-    if (!mounted) return const _Loc(0, 0, 0, '', false);
-    final choice = await showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.surface,
-        title: const Text('Lokasi tidak tersedia'),
-        content: Text(res.message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, 'none'),
-            child: const Text('Tanpa lokasi'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, 'manual'),
-            child: const Text('Pilih di peta'),
-          ),
-        ],
-      ),
-    );
-
-    if (choice == 'manual') {
-      final picked = await _openMapPicker(null);
-      if (picked != null) {
-        return _Loc(picked.lat, picked.lng, 0, picked.address, true);
-      }
+    // Gagal → beri tahu pengguna, lanjut tanpa lokasi (tanpa freeze).
+    if (mounted) {
+      showAppMessage(context, res.message, error: true);
     }
     return const _Loc(0, 0, 0, '', false);
-  }
-
-  Future<MapPickResult?> _openMapPicker(MapPickResult? initial) async {
-    if (!mounted) return null;
-    return Navigator.of(context).push<MapPickResult>(
-      MaterialPageRoute(
-        builder: (_) => MapPickerScreen(initial: initial),
-      ),
-    );
-  }
-
-  Future<void> _pickManualLocation() async {
-    final picked = await _openMapPicker(_manualLocation);
-    if (picked != null && mounted) {
-      setState(() => _manualLocation = picked);
-      showAppMessage(context, 'Lokasi manual aktif.');
-    }
   }
 
   @override
@@ -452,21 +415,6 @@ class _CameraScreenState extends State<CameraScreen>
               ),
             ),
           ),
-        if (_manualLocation != null)
-          Positioned(
-            top: 12,
-            left: 12,
-            child: Chip(
-              backgroundColor: Colors.black.withOpacity(0.6),
-              avatar: const Icon(Icons.place, color: AppTheme.accent, size: 18),
-              label: Text(
-                'Lokasi manual',
-                style: TextStyle(color: Colors.white.withOpacity(0.9)),
-              ),
-              onDeleted: () => setState(() => _manualLocation = null),
-              deleteIcon: const Icon(Icons.close, size: 16, color: Colors.white),
-            ),
-          ),
         if (_busy)
           Container(
             color: Colors.black54,
@@ -491,16 +439,12 @@ class _CameraScreenState extends State<CameraScreen>
   Widget _buildControls() {
     final ready = _controller != null && _initError == null && !_initializing;
     return Container(
-      color: Colors.black,
+      color: Colors.black.withValues(alpha: 0.82),
       padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 24),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _circleButton(
-            icon: Icons.map_outlined,
-            label: 'Peta',
-            onTap: ready && !_busy ? _pickManualLocation : null,
-          ),
+          const SizedBox(width: 54),
           GestureDetector(
             onTap: ready && !_busy ? _onShutter : null,
             child: Container(
