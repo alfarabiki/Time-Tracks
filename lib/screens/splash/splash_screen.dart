@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 
 import '../../utils/app_theme.dart';
-import '../camera/camera_screen.dart';
+import '../shell/app_shell.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future<void>.delayed(const Duration(milliseconds: 1400));
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const CameraScreen()),
+      MaterialPageRoute(builder: (_) => const AppShell()),
     );
   }
 
