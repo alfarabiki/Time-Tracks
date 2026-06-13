@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../models/photo_record.dart';
@@ -50,13 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool _isToday(DateTime t) { final n = DateTime.now(); return t.year==n.year && t.month==n.month && t.day==n.day; }
 
-  String _initials(String s) {
-    final parts = s.trim().split(RegExp(r'\s+'));
-    if (parts.isEmpty || parts.first.isEmpty) return 'M';
-    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
-    return (parts.first.substring(0,1) + parts.last.substring(0,1)).toUpperCase();
-  }
-
   @override
   Widget build(BuildContext context) {
     final staff = SettingsService.instance.current.staffName;
@@ -66,14 +61,8 @@ class _HomeScreenState extends State<HomeScreen> {
       child: RefreshIndicator(
         onRefresh: _load,
         child: ListView(padding: const EdgeInsets.fromLTRB(22, 8, 22, 24), children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Image.asset('assets/branding/radjak_logo.png', height: 30),
-            Container(width: 42, height: 42, decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              gradient: const LinearGradient(colors: [AppTheme.primary, AppTheme.secondary])),
-              child: Center(child: Text(_initials(name),
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)))),
-          ]),
+          Align(alignment: Alignment.centerLeft,
+            child: Image.asset('assets/branding/radjak_logo.png', height: 32)),
           const SizedBox(height: 22),
           Text(_greeting(), style: const TextStyle(color: AppTheme.textSecondary, fontSize: 13, fontWeight: FontWeight.w500)),
           const SizedBox(height: 3),
@@ -101,6 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
             meta: '${DateFormat('HH:mm').format(r.timestamp)} · ${r.visitType.isEmpty ? "Kunjungan" : r.visitType}',
             trackingNumber: r.trackingNumber,
             chip: _isToday(r.timestamp) ? 'Hari ini' : '',
+            thumbnail: r.imagePath.isNotEmpty && File(r.imagePath).existsSync()
+                ? Image.file(File(r.imagePath), fit: BoxFit.cover)
+                : null,
             onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => PhotoDetailScreen(record: r))),
           )),
         ]),
